@@ -1,0 +1,154 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>pe.com.claro</groupId>
+		<artifactId>consultaclientecesws</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	<artifactId>consultaclientecesws-webapp</artifactId>
+	<packaging>war</packaging>
+	<name>ConsultaClienteCESWS</name>
+
+	<properties>
+		<spring.version>3.1.2.RELEASE</spring.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>pe.com.claro</groupId>
+			<artifactId>consultaclientecesws-service</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>pe.com.claro</groupId>
+			<artifactId>consultaclientecesws-model</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.name}-${project.parent.version}</finalName>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.3</version>
+					<configuration>
+						<source>1.8</source>
+						<target>1.8</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.1.1</version>
+					<configuration>
+						<failOnMissingWebXml>false</failOnMissingWebXml>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.oracle.weblogic</groupId>
+					<artifactId>weblogic-maven-plugin</artifactId>
+					<version>12.2.1-0-0</version>
+					<!-- You can find and redefine the following variables in the parent 
+						pom file arccording to your environment. oracleMiddlewareHome oracleServerUrl 
+						oracleUsername oraclePassword oracleServerName -->
+					<configuration>
+						<middlewareHome>${oracleMiddlewareHome}</middlewareHome>
+					</configuration>
+					<executions>
+						<!--Deploy the application to the server -->
+						<execution>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>deploy</goal>
+							</goals>
+							<configuration>
+								<!--The admin URL where the app is deployed. Here use the plugin's 
+									default value t3://localhost:7001 -->
+								<adminurl>t3://localhost:7001</adminurl>
+								<user>weblogic</user>
+								<password>weblogic123</password>
+								<!--The location of the file or directory to be deployed -->
+								<source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source>
+								<!--The target servers where the application is deployed. Here use 
+									the plugin's default value AdminServer -->
+								<targets>AdminServer</targets>
+								<verbose>true</verbose>
+								<name>${project.build.finalName}</name>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="consultaclientecesws-integration" />
+        <module name="consultaclientecesws-common" />
+        <module name="consultaclientecesws-webapp" />
+        <module name="consultaclientecesws-service" />
+        <module name="consultaclientecesws-dao" />
+        <module name="consultaclientecesws-model" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>
