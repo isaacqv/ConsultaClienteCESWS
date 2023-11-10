@@ -19,12 +19,22 @@
     <remote-repository>
       <option name="id" value="repo" />
       <option name="name" value="repo" />
+      <option name="url" value="file://D:\DESARROLLO\SOAP - ConsultaClienteCESWS\CambiosMiguel\consultaclientecesws-dao/lib" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="repo" />
+      <option name="name" value="repo" />
       <option name="url" value="file://D:\DESARROLLO\SOAP - ConsultaClienteCESWS\CambiosIsaac\consultaclientecesws-dao/lib" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="jboss.community" />
       <option name="name" value="JBoss Community repository" />
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="repo" />
+      <option name="name" value="repo" />
+      <option name="url" value="file://D:\DESARROLLO\SOAP - ConsultaClienteCESWS\CambiosMiguel\consultaclientecesws-integration/lib" />
     </remote-repository>
   </component>
 </project>

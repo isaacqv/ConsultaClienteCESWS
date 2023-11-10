@@ -1,7 +1,41 @@
 package pe.com.claro.eai.ws.postventa.consultaclientecesws.dao;
 
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.*;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClienteRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClienteResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalDTHRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalDTHResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEstadoServiciosRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEstadoServiciosResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarFallaRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarFallaResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarInteraccionCasosRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarInteraccionCasosResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarJanusRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarJanusResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarReglaRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarReglaResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarSeaChangeRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarSeaChangeResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioSucursalRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioSucursalResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGARequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGAResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ObtenerDatosClienteResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.RegistrarAuditoriaRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.RegistrarAuditoriaResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.DBException;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarNumeroTelefonoRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarNumeroTelefonoResponse;
 
 public interface SgaDao {
 
@@ -30,5 +64,6 @@ public interface SgaDao {
 	String obtenerNumeroDocumento(String mensajeTransaccion, String strCodCli) throws DBException;
 	ConsultarClientePorNombreResponse consultarClientePorNombre(String mensajeTransaccion, ConsultarClientePorNombreRequest objConsultarClientePorNombreRequest) throws DBException;
 	ConsultarTecnologiaSGAResponse consultarTecnologia(String paramString, ConsultarTecnologiaSGARequest paramConsultarTecnologiaSGARequest) throws DBException;
+	ConsultarNumeroTelefonoResponse consultarNumeroTelefono(String mensajeTransaccion, ConsultarNumeroTelefonoRequest objConsultarNumeroTelefonoRequest) throws DBException;
 	ObtenerDatosClienteResponse obtenerDatosCliente(String mensajeTransaccion, String i_codId) throws DBException;
 }
