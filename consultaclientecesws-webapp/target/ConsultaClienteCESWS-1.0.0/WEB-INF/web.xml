@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	id="WebApp_ID" version="3.1">
+	<display-name>ConsultaClienteCESWS</display-name>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/applicationContext.xml</param-value>
+	</context-param>
+
+	<servlet-mapping>
+		<servlet-name>ConsultaClienteCESSB11</servlet-name>
+		<url-pattern>/ebsconsultaClienteCESSB11</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ConsultaClienteCESSB11</servlet-name>
+		<servlet-class>pe.com.claro.eai.ws.postventa.consultaclientecesws.ConsultaClienteCESSB11</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ConsultaClienteCESSB12</servlet-name>
+		<url-pattern>/ebsconsultaClienteCESSB12</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ConsultaClienteCESSB12</servlet-name>
+		<servlet-class>pe.com.claro.eai.ws.postventa.consultaclientecesws.ConsultaClienteCESSB12</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+
+</web-app>

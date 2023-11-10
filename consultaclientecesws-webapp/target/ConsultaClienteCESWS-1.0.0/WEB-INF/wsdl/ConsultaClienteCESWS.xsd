@@ -1,0 +1,602 @@
+<xsd:schema
+	targetNamespace="http://claro.com.pe/eai/ws/postventa/consultaclientecesws/types"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:encequv1="http://claro.com.pe/eai/ws/postventa/consultaclientecesws/types"
+	xmlns:base="http://claro.com.pe/eai/ws/baseschema">
+	
+	<xsd:import namespace="http://claro.com.pe/eai/ws/baseschema" schemaLocation="BaseSchema.xsd" />
+
+	<xsd:element name="consultarClienteRequest" type="encequv1:consultarClienteRequestType"/>
+	<xsd:element name="consultarClienteResponse" type="encequv1:consultarClienteResponseType"/>
+
+	<xsd:element name="consultarClientePorNombreRequest" type="encequv1:consultarClientePorNombreRequestType"/>
+	<xsd:element name="consultarClientePorNombreResponse" type="encequv1:consultarClientePorNombreResponseType"/>
+
+	<xsd:element name="consultarSucursalDetalleRequest" type="encequv1:consultarSucursalDetalleRequestType"/>
+	<xsd:element name="consultarSucursalDetalleResponse" type="encequv1:consultarSucursalDetalleResponseType"/>
+
+	<xsd:element name="consultarJanusRequest" type="encequv1:consultarJanusRequestType"/>
+	<xsd:element name="consultarJanusResponse" type="encequv1:consultarJanusResponseType"/>
+
+	<xsd:element name="consultarServicioRequest" type="encequv1:consultarServicioRequestType"/>
+	<xsd:element name="consultarServicioResponse" type="encequv1:consultarServicioResponseType"/>
+
+	<xsd:element name="consultarSeaChangeRequest" type="encequv1:consultarSeaChangeRequestType"/>
+	<xsd:element name="consultarSeaChangeResponse" type="encequv1:consultarSeaChangeResponseType"/>
+
+	<xsd:element name="consultarInteraccionCasosRequest" type="encequv1:consultarInteraccionCasosRequestType"/>
+	<xsd:element name="consultarInteraccionCasosResponse" type="encequv1:consultarInteraccionCasosResponseType"/>
+
+	<xsd:element name="consultarFallaRequest" type="encequv1:consultarFallaRequestType"/>
+	<xsd:element name="consultarFallaResponse" type="encequv1:consultarFallaResponseType"/>
+
+	<xsd:element name="consultarEquipoRequest" type="encequv1:consultarEquipoRequestType"/>
+	<xsd:element name="consultarEquipoResponse" type="encequv1:consultarEquipoResponseType"/>
+
+	<xsd:element name="consultarReglaRequest" type="encequv1:consultarReglaRequestType"/>
+	<xsd:element name="consultarReglaResponse" type="encequv1:consultarReglaResponseType"/>
+	
+	<xsd:element name="reconectarNcosRequest" type="encequv1:reconectarNcosRequestType"/>
+	<xsd:element name="reconectarNcosResponse" type="encequv1:reconectarNcosResponseType"/>
+	
+	<xsd:element name="headerRequest" type="encequv1:HeaderRequest"/>
+	<xsd:element name="headerResponse" type="encequv1:HeaderResponse"/>
+	<xsd:element name="claroFault" type="encequv1:ClaroFault"/>
+
+	<xsd:complexType name="consultarClienteRequestType">
+		<xsd:sequence>
+			<xsd:element name="auditRequest" type="base:auditRequestType" />
+			<xsd:element name="tipoBusqueda" type="xsd:string"/>
+			<xsd:element name="valorBusqueda" type="xsd:string"/>
+			<xsd:element name="listaRequestOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarClienteResponseType">
+		<xsd:sequence>
+			<xsd:element name="auditResponse" type="base:auditResponseType" />
+			<xsd:element name="listaCliente" type="encequv1:listaClienteType" />
+			<xsd:element name="listaResponseOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="listaClienteType">
+		<xsd:sequence>
+			<xsd:element name="cliente" type="encequv1:clienteType" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="clienteType">
+		<xsd:sequence>
+			<xsd:element name="customerid" type="xsd:string"/>
+			<xsd:element name="cuenta" type="xsd:string"/>
+			<xsd:element name="codCli" type="xsd:string"/>
+			<xsd:element name="billcycle" type="xsd:string"/>
+			<xsd:element name="nomCli" type="xsd:string"/>
+			<xsd:element name="ccname" type="xsd:string"/>
+			<xsd:element name="nombres" type="xsd:string"/>
+			<xsd:element name="apellidos" type="xsd:string"/>
+			<xsd:element name="tipoDoc" type="xsd:string"/>
+			<xsd:element name="numDoc" type="xsd:string"/>
+			<xsd:element name="tipoPersona" type="xsd:string"/>
+			<xsd:element name="categoria" type="xsd:string"/>
+			<xsd:element name="direccion" type="xsd:string"/>
+			<xsd:element name="distrito" type="xsd:string"/>
+			<xsd:element name="provincia" type="xsd:string"/>
+			<xsd:element name="departamento" type="xsd:string"/>
+			<xsd:element name="mail" type="xsd:string"/>
+			<xsd:element name="telefReferencia" type="xsd:string"/>
+			<xsd:element name="estadoCliente" type="xsd:string"/>
+			<xsd:element name="correspElectronica" type="xsd:string"/>
+			<xsd:element name="codSuc" type="xsd:string"/>
+			<xsd:element name="numSlc" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarClientePorNombreRequestType">
+		<xsd:sequence>
+			<xsd:element name="auditRequest" type="base:auditRequestType" />
+			<xsd:element name="tipoBusqueda" type="xsd:string"/>
+			<xsd:element name="valorBusqueda" type="xsd:string"/>
+			<xsd:element name="listaRequestOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarClientePorNombreResponseType">
+		<xsd:sequence>
+			<xsd:element name="auditResponse" type="base:auditResponseType" />
+			<xsd:element name="listaClientePorNombre" type="encequv1:clientePorNombreType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="listaResponseOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="clientePorNombreType">
+		<xsd:sequence>
+			<xsd:element name="nombres" type="xsd:string"/>
+			<xsd:element name="apellidos" type="xsd:string"/>
+			<xsd:element name="ccname" type="xsd:string"/>
+			<xsd:element name="tipoDoc" type="xsd:string"/>
+			<xsd:element name="numDoc" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarSucursalDetalleRequestType">
+		<xsd:sequence>
+			<xsd:element name="auditRequest" type="base:auditRequestType" />
+			<xsd:element name="nrodocumento" type="xsd:string"/>
+			<xsd:element name="listaRequestOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarSucursalDetalleResponseType">
+		<xsd:sequence>
+			<xsd:element name="auditResponse" type="base:auditResponseType" />
+			<xsd:element name="listaSucursal" type="encequv1:listaSucursalesType" />
+			<xsd:element name="listaResponseOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="listaSucursalesType">
+		<xsd:sequence>
+			<xsd:element name="sucursal" type="encequv1:SucursalType" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="SucursalType">
+		<xsd:sequence>
+			<xsd:element name="tecnologia" type="xsd:string"/>
+			<xsd:element name="customerid" type="xsd:string"/>
+			<xsd:element name="co_id" type="xsd:string"/>
+			<xsd:element name="numero" type="xsd:string"/>
+			<xsd:element name="codigoPago" type="xsd:string"/>
+			<xsd:element name="estado" type="xsd:string"/>
+			<xsd:element name="motivoEstado" type="xsd:string"/>
+			<xsd:element name="codcli" type="xsd:string"/>
+			<xsd:element name="codsuc" type="xsd:string"/>
+			<xsd:element name="codsolot" type="xsd:string"/>
+			<xsd:element name="direccion" type="xsd:string"/>
+			<xsd:element name="plano" type="xsd:string"/>
+			<xsd:element name="ubigeo" type="xsd:string"/>
+			<xsd:element name="departamento" type="xsd:string"/>
+			<xsd:element name="provincia" type="xsd:string"/>
+			<xsd:element name="distrito" type="xsd:string"/>
+			<xsd:element name="internet" type="xsd:string"/>
+			<xsd:element name="telefonia" type="xsd:string"/>
+			<xsd:element name="cable" type="xsd:string"/>
+			<xsd:element name="faspid" type="xsd:string"/>
+			<xsd:element name="faspmessage" type="xsd:string"/>
+			<xsd:element name="seraffected" type="xsd:string"/>
+			<xsd:element name="listaServicioSucursal" type="encequv1:listaServicioSucursalType" />
+			<xsd:element name="flgPortable" type="xsd:string"/>
+			<xsd:element name="numSlc" type="xsd:string"/>
+			<xsd:element name="plataforma" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="listaServicioSucursalType">
+		<xsd:sequence>
+			<xsd:element name="servicioSucursal" type="encequv1:ServicioSucursalType" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="ServicioSucursalType">
+		<xsd:sequence>
+			<xsd:element name="tipoServicio" type="xsd:string"/>
+			<xsd:element name="servicio" type="xsd:string"/>
+			<xsd:element name="validoDesde" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarJanusRequestType">
+		<xsd:sequence>
+			<xsd:element name="sucursal" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarJanusResponseType">
+		<xsd:sequence>
+			<xsd:element name="responseStatus" type="encequv1:ResponseStatus"/>
+			<xsd:element name="responseData" type="encequv1:listaJanusType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="listaJanusType">
+		<xsd:sequence>
+			<xsd:element name="listaJanus" type="encequv1:JanusType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="avOutCodError" type="xsd:string"/>
+			<xsd:element name="avOutDesError" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="JanusType">
+		<xsd:sequence>
+			<xsd:element name="numero" type="xsd:string"/>
+			<xsd:element name="customerid" type="xsd:string"/>
+			<xsd:element name="codPlan" type="xsd:string"/>
+			<xsd:element name="producto" type="xsd:string"/>
+			<xsd:element name="tipoPlan" type="xsd:string"/>
+			<xsd:element name="fecIni" type="xsd:string"/>
+			<xsd:element name="flgEstado" type="xsd:string"/>
+			<xsd:element name="estado" type="xsd:string"/>
+			<xsd:element name="ciclo" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarServicioRequestType">
+		<xsd:sequence>
+			<xsd:element name="auditRequest" type="base:auditRequestType" />
+			<xsd:element name="co_id" type="xsd:string"/>
+			<xsd:element name="cod_sucursal" type="xsd:string"/>
+			<xsd:element name="plataforma" type="xsd:string"/>
+			<xsd:element name="listaRequestOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarServicioResponseType">
+		<xsd:sequence>
+			<xsd:element name="auditResponse" type="base:auditResponseType" />
+			<xsd:element name="listaServicio" type="encequv1:listaServicioType" />
+			<xsd:element name="listaResponseOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="listaServicioType">
+		<xsd:sequence>
+			<xsd:element name="servicio" type="encequv1:ServicioType" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ServicioType">
+		<xsd:sequence>
+			<xsd:element name="grupo" type="xsd:string"/>
+			<xsd:element name="servicio" type="xsd:string"/>
+			<xsd:element name="estado" type="xsd:string"/>
+			<xsd:element name="validoDesde" type="xsd:string"/>
+			<xsd:element name="tipoServicio" type="xsd:string"/>
+			<xsd:element name="codBloqueo" type="xsd:string"/>
+			<xsd:element name="bloqueo" type="xsd:string"/>
+			<xsd:element name="cargoFijo" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarSeaChangeRequestType">
+		<xsd:sequence>
+			<xsd:element name="clientId" type="xsd:string"/>
+			<xsd:element name="platform" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarSeaChangeResponseType">
+		<xsd:sequence>
+			<xsd:element name="responseStatus" type="encequv1:ResponseStatus"/>
+			<xsd:element name="responseData" type="encequv1:listaSeaChangeType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="listaSeaChangeType">
+		<xsd:sequence>
+			<xsd:element name="listaSeaChange" type="encequv1:SeaChangeType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="avOutCodError" type="xsd:string"/>
+			<xsd:element name="avOutDesError" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="SeaChangeType">
+		<xsd:sequence>
+			<xsd:element name="clientId" type="xsd:string"/>
+			<xsd:element name="credit" type="xsd:string"/>
+			<xsd:element name="mac" type="xsd:string"/>
+			<xsd:element name="serialNumber" type="xsd:string"/>
+			<xsd:element name="loadDate" type="xsd:string"/>
+			<xsd:element name="platformType" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarInteraccionCasosRequestType">
+		<xsd:sequence>
+			<xsd:element name="auditRequest" type="base:auditRequestType" />
+			<xsd:element name="plataforma" type="xsd:string"/>
+			<xsd:element name="tecnologia" type="xsd:string"/>
+			<xsd:element name="proceso" type="xsd:string"/>
+			<xsd:element name="telefono" type="xsd:string"/>
+			<xsd:element name="customerId" type="xsd:string"/>
+			<xsd:element name="codSucursal" type="xsd:string"/>
+			<xsd:element name="codCliente" type="xsd:string"/>
+			<xsd:element name="listaRequestOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarInteraccionCasosResponseType">
+		<xsd:sequence>
+			<xsd:element name="auditResponse" type="base:auditResponseType" />
+			<xsd:element name="listaDatosInfVar" type="encequv1:DatosInfVarType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="listaDatosSot" type="encequv1:DatosSotType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="listaDatosIncidencia" type="encequv1:DatosIncidenciaType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="listaDatosProblema" type="encequv1:DatosProblemaType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="listaResponseOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="DatosInfVarType">
+		<xsd:sequence>
+			<xsd:element name="interaccion" type="xsd:string"/>
+			<xsd:element name="fecCreacion" type="xsd:string"/>
+			<xsd:element name="fecInicio" type="xsd:string"/>
+			<xsd:element name="telefono" type="xsd:string"/>
+			<xsd:element name="tipo" type="xsd:string"/>
+			<xsd:element name="clase" type="xsd:string"/>
+			<xsd:element name="subClase" type="xsd:string"/>
+			<xsd:element name="tipificacion" type="xsd:string"/>
+			<xsd:element name="tipoCodigo" type="xsd:string"/>
+			<xsd:element name="claseCodigo" type="xsd:string"/>
+			<xsd:element name="subClaseCodigo" type="xsd:string"/>
+			<xsd:element name="insertadoPor" type="xsd:string"/>
+			<xsd:element name="tipoInter" type="xsd:string"/>
+			<xsd:element name="metodo" type="xsd:string"/>
+			<xsd:element name="resultado" type="xsd:string"/>
+			<xsd:element name="hechoEnUno" type="xsd:string"/>
+			<xsd:element name="agente" type="xsd:string"/>
+			<xsd:element name="nombreAgente" type="xsd:string"/>
+			<xsd:element name="apellidoAgente" type="xsd:string"/>
+			<xsd:element name="idCaso" type="xsd:string"/>
+			<xsd:element name="estado" type="xsd:string"/>
+			<xsd:element name="servicio" type="xsd:string"/>
+			<xsd:element name="inconveniente" type="xsd:string"/>
+			<xsd:element name="contrato" type="xsd:string"/>
+			<xsd:element name="plano" type="xsd:string"/>
+			<xsd:element name="plataforma" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="DatosSotType">
+		<xsd:sequence>
+			<xsd:element name="fecRegistro" type="xsd:string"/>
+			<xsd:element name="usuRegistro" type="xsd:string"/>
+			<xsd:element name="codSolot" type="xsd:string"/>
+			<xsd:element name="codTipoTrabajo" type="xsd:string"/>
+			<xsd:element name="tipoTrabajo" type="xsd:string"/>
+			<xsd:element name="cliente" type="xsd:string"/>
+			<xsd:element name="codMotivo" type="xsd:string"/>
+			<xsd:element name="motivo" type="xsd:string"/>
+			<xsd:element name="estadoSot" type="xsd:string"/>
+			<xsd:element name="codId" type="xsd:string"/>
+			<xsd:element name="fecAgendamiento" type="xsd:string"/>
+			<xsd:element name="estadoAgenda" type="xsd:string"/>
+			<xsd:element name="observacion" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="DatosIncidenciaType">
+		<xsd:sequence>
+			<xsd:element name="nroIncidencia" type="xsd:string"/>
+			<xsd:element name="codigoSubCategoria" type="xsd:string"/>
+			<xsd:element name="tipoIncidencia" type="xsd:string"/>
+			<xsd:element name="clasificacionIncidencia" type="xsd:string"/>
+			<xsd:element name="nroTicket" type="xsd:string"/>
+			<xsd:element name="fechaRegistro" type="xsd:string"/>
+			<xsd:element name="codigoCaso" type="xsd:string"/>
+			<xsd:element name="tipoCaso" type="xsd:string"/>
+			<xsd:element name="estado" type="xsd:string"/>
+			<xsd:element name="nroServicio" type="xsd:string"/>
+			<xsd:element name="areaRegistro" type="xsd:string"/>
+			<xsd:element name="usuarioRegistro" type="xsd:string"/>
+			<xsd:element name="areaUltimaDerivacion" type="xsd:string"/>
+			<xsd:element name="usuarioUltimaDerivacion" type="xsd:string"/>
+			<xsd:element name="fechaUlitmaSecuencia" type="xsd:string"/>
+			<xsd:element name="solucion" type="xsd:string"/>
+			<xsd:element name="familia" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="DatosProblemaType">
+		<xsd:sequence>
+			<xsd:element name="codigoCliente" type="xsd:string"/>
+			<xsd:element name="sitio" type="xsd:string"/>
+			<xsd:element name="idCaso" type="xsd:string"/>
+			<xsd:element name="fechaCreacion" type="xsd:string"/>
+			<xsd:element name="telefono" type="xsd:string"/>
+			<xsd:element name="tipificacion" type="xsd:string"/>
+			<xsd:element name="origen" type="xsd:string"/>
+			<xsd:element name="estado" type="xsd:string"/>
+			<xsd:element name="prioridad" type="xsd:string"/>
+			<xsd:element name="severidad" type="xsd:string"/>
+			<xsd:element name="fase" type="xsd:string"/>
+			<xsd:element name="nroReporte" type="xsd:string"/>
+			<xsd:element name="nroReclamo" type="xsd:string"/>
+			<xsd:element name="condicion" type="xsd:string"/>
+			<xsd:element name="cola" type="xsd:string"/>
+			<xsd:element name="propietario" type="xsd:string"/>
+			<xsd:element name="nombreAgente" type="xsd:string"/>
+			<xsd:element name="apellidoAgente" type="xsd:string"/>
+			<xsd:element name="resultado" type="xsd:string"/>
+			<xsd:element name="resolucion" type="xsd:string"/>
+			<xsd:element name="bandeja" type="xsd:string"/>
+			<xsd:element name="tipoCode" type="xsd:string"/>
+			<xsd:element name="claseCode" type="xsd:string"/>
+			<xsd:element name="subClaseCode" type="xsd:string"/>
+			<xsd:element name="servicio" type="xsd:string"/>
+			<xsd:element name="inconveniente" type="xsd:string"/>
+			<xsd:element name="contrato" type="xsd:string"/>
+			<xsd:element name="plano" type="xsd:string"/>
+			<xsd:element name="idInteraccion" type="xsd:string"/>
+			<xsd:element name="usuarioAplicacion" type="xsd:string"/>
+			<xsd:element name="plataforma" type="xsd:string"/>
+			<xsd:element name="sentido" type="xsd:string"/>
+			<xsd:element name="montoAjustado" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarFallaRequestType">
+		<xsd:sequence>
+			<xsd:element name="auditRequest" type="base:auditRequestType" />
+			<xsd:element name="tipo" type="xsd:string"/>
+			<xsd:element name="plano" type="xsd:string"/>
+			<xsd:element name="listaRequestOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarFallaResponseType">
+		<xsd:sequence>
+			<xsd:element name="auditResponse" type="base:auditResponseType" />
+			<xsd:element name="listaFallaCrq" type="encequv1:FallaType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="listaFallaInc" type="encequv1:FallaType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="listaResponseOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="FallaType">
+		<xsd:sequence>
+			<xsd:element name="numeroFalla" type="xsd:string"/>
+			<xsd:element name="detalleProblema" type="xsd:string"/>
+			<xsd:element name="motivo" type="xsd:string"/>
+			<xsd:element name="observacion" type="xsd:string"/>
+			<xsd:element name="tiempoSolucion" type="xsd:string"/>
+			<xsd:element name="fechaInicio" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarEquipoRequestType">
+		<xsd:sequence>
+			<xsd:element name="auditRequest" type="base:auditRequestType" />
+			<xsd:element name="tecnologia" type="xsd:string"/>
+			<xsd:element name="customerId" type="xsd:string"/>
+			<xsd:element name="codSolot" type="xsd:string"/>
+			<xsd:element name="coId" type="xsd:string"/>
+			<xsd:element name="listaRequestOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="consultarEquipoResponseType">
+		<xsd:sequence>
+			<xsd:element name="auditResponse" type="base:auditResponseType" />
+			<xsd:element name="listaEquipo" type="encequv1:listaEquipoType" />
+			<xsd:element name="listaResponseOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="listaEquipoType">
+		<xsd:sequence>
+			<xsd:element name="equipo" type="encequv1:EquipoType" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="EquipoType">
+		<xsd:sequence>
+			<xsd:element name="type" type="xsd:string"/>
+			<xsd:element name="customerId" type="xsd:string"/>
+			<xsd:element name="model" type="xsd:string"/>
+			<xsd:element name="macAddress" type="xsd:string"/>
+			<xsd:element name="serialNumber" type="xsd:string"/>
+			<xsd:element name="equipmentCodeInc" type="xsd:string"/>
+			<xsd:element name="modelCodeInc" type="xsd:string"/>
+			<xsd:element name="cardNumber" type="xsd:string"/>
+			<xsd:element name="uaNumber" type="xsd:string"/>
+			<xsd:element name="parentId" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="consultarReglaRequestType">
+		<xsd:sequence>
+			<xsd:element name="customerId" type="xsd:string"/>
+			<xsd:element name="codSolot" type="xsd:string"/>
+			<xsd:element name="telefono" type="xsd:string"/>
+			<xsd:element name="coId" type="xsd:string"/>
+			<xsd:element name="cicloOAC" type="xsd:string"/>
+			<xsd:element name="rulers" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="consultarReglaResponseType">
+		<xsd:sequence>
+			<xsd:element name="responseStatus" type="encequv1:ResponseStatus"/>
+			<xsd:element name="responseData" type="encequv1:listaReglaType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="listaReglaType">
+		<xsd:sequence>
+			<xsd:element name="listaRegla" type="encequv1:reglaType" minOccurs="1" maxOccurs="unbounded"/>
+			<xsd:element name="avOutCodError" type="xsd:string"/>
+			<xsd:element name="avOutDesError" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="reglaType">
+		<xsd:sequence>
+			<xsd:element name="codRegla" type="xsd:string"/>
+			<xsd:element name="codRespuesta" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="reconectarNcosRequestType">
+		<xsd:sequence>
+			<xsd:element name="auditRequest" type="base:auditRequestType" />
+			<xsd:element name="customerId" type="xsd:string"/>
+			<xsd:element name="listaRequestOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="reconectarNcosResponseType">
+		<xsd:sequence>
+			<xsd:element name="auditResponse" type="base:auditResponseType" />
+			<xsd:element name="callBarringType" type="xsd:string"/>
+			<xsd:element name="listaResponseOpcional" minOccurs="1" maxOccurs="1" type="base:parametrosType" />
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<!-- Estandar -->
+
+	<xsd:complexType name="ResponseStatus">
+		<xsd:sequence>
+			<xsd:element name="status" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="codeResponse" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="descriptionResponse" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="errorLocation" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="origin" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="errorDetails" type="encequv1:errorDetailType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="errorDetailType">
+		<xsd:sequence>
+			<xsd:element name="errorCode" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="errorDescription" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="HeaderRequest">
+		<xsd:sequence>
+			<xsd:element name="channel" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="idApplication" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="userApplication" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="userSession" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="idESBTransaction" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="idBusinessTransaction" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="startDate" type="xsd:dateTime" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="additionalNode" type="xsd:anyType" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="HeaderResponse">
+		<xsd:sequence>
+			<xsd:element name="idESBTransaction" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="idBusinessTransaction" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="startDate" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="endDate" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="additionalNode" type="xsd:anyType" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ClaroFault">
+		<xsd:sequence>
+			<xsd:element name="idAudit" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="codeError" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="descriptionError" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="locationError" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="date" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="originError" type="xsd:anyType" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>

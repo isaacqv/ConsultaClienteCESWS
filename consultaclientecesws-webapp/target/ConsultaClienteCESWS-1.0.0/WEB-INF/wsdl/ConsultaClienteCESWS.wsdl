@@ -1,0 +1,383 @@
+<wsdl:definitions
+	targetNamespace="http://claro.com.pe/eai/ws/postventa/consultaclientecesws"
+	xmlns:poscequ="http://claro.com.pe/eai/ws/postventa/consultaclientecesws"
+	xmlns:encequv1="http://claro.com.pe/eai/ws/postventa/consultaclientecesws/types"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+	<wsdl:types>
+		<xsd:schema>
+			<xsd:import namespace="http://claro.com.pe/eai/ws/postventa/consultaclientecesws/types" schemaLocation="ConsultaClienteCESWS.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="headerRequest">
+		<wsdl:part name="headerRequest" element="encequv1:headerRequest"/>
+	</wsdl:message>
+	<wsdl:message name="headerResponse">
+		<wsdl:part name="headerResponse" element="encequv1:headerResponse"/>
+	</wsdl:message>
+	<wsdl:message name="claroFault">
+		<wsdl:part name="claroFault" element="encequv1:claroFault"/>
+	</wsdl:message>
+
+	<!-- Messages -->
+	<wsdl:message name="consultarClienteRequestMsg">
+		<wsdl:part name="consultarClienteRequestMsg" element="encequv1:consultarClienteRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarClienteResponseMsg">
+		<wsdl:part name="consultarClienteResponseMsg" element="encequv1:consultarClienteResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="consultarClientePorNombreRequestMsg">
+		<wsdl:part name="consultarClientePorNombreRequestMsg" element="encequv1:consultarClientePorNombreRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarClientePorNombreResponseMsg">
+		<wsdl:part name="consultarClientePorNombreResponseMsg" element="encequv1:consultarClientePorNombreResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="consultarSucursalDetalleRequestMsg">
+		<wsdl:part name="consultarSucursalDetalleRequestMsg" element="encequv1:consultarSucursalDetalleRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarSucursalDetalleResponseMsg">
+		<wsdl:part name="consultarSucursalDetalleResponseMsg" element="encequv1:consultarSucursalDetalleResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="consultarJanusRequestMsg">
+		<wsdl:part name="consultarJanusRequestMsg" element="encequv1:consultarJanusRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarJanusResponseMsg">
+		<wsdl:part name="consultarJanusResponseMsg" element="encequv1:consultarJanusResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="consultarServicioRequestMsg">
+		<wsdl:part name="consultarServicioRequestMsg" element="encequv1:consultarServicioRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarServicioResponseMsg">
+		<wsdl:part name="consultarServicioResponseMsg" element="encequv1:consultarServicioResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="consultarSeaChangeRequestMsg">
+		<wsdl:part name="consultarSeaChangeRequestMsg" element="encequv1:consultarSeaChangeRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarSeaChangeResponseMsg">
+		<wsdl:part name="consultarSeaChangeResponseMsg" element="encequv1:consultarSeaChangeResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="consultarInteraccionCasosRequestMsg">
+		<wsdl:part name="consultarInteraccionCasosRequestMsg" element="encequv1:consultarInteraccionCasosRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarInteraccionCasosResponseMsg">
+		<wsdl:part name="consultarInteraccionCasosResponseMsg" element="encequv1:consultarInteraccionCasosResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="consultarFallaRequestMsg">
+		<wsdl:part name="consultarFallaRequestMsg" element="encequv1:consultarFallaRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarFallaResponseMsg">
+		<wsdl:part name="consultarFallaResponseMsg" element="encequv1:consultarFallaResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="consultarEquipoRequestMsg">
+		<wsdl:part name="consultarEquipoRequestMsg" element="encequv1:consultarEquipoRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarEquipoResponseMsg">
+		<wsdl:part name="consultarEquipoResponseMsg" element="encequv1:consultarEquipoResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="consultarReglaRequestMsg">
+		<wsdl:part name="consultarReglaRequestMsg" element="encequv1:consultarReglaRequest"/>
+	</wsdl:message>
+	<wsdl:message name="consultarReglaResponseMsg">
+		<wsdl:part name="consultarReglaResponseMsg" element="encequv1:consultarReglaResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="reconectarNcosRequestMsg">
+		<wsdl:part name="reconectarNcosRequestMsg" element="encequv1:reconectarNcosRequest"/>
+	</wsdl:message>
+	<wsdl:message name="reconectarNcosResponseMsg">
+		<wsdl:part name="reconectarNcosResponseMsg" element="encequv1:reconectarNcosResponse"/>
+	</wsdl:message>
+	
+	<wsdl:portType name="ConsultaClienteCESWSPortType">
+		<wsdl:operation name="consultarCliente">
+			<wsdl:input message="poscequ:consultarClienteRequestMsg"/>
+			<wsdl:output message="poscequ:consultarClienteResponseMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultarClientePorNombre">
+			<wsdl:input message="poscequ:consultarClientePorNombreRequestMsg"/>
+			<wsdl:output message="poscequ:consultarClientePorNombreResponseMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultarSucursalDetalle">
+			<wsdl:input message="poscequ:consultarSucursalDetalleRequestMsg"/>
+			<wsdl:output message="poscequ:consultarSucursalDetalleResponseMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultarJanus">
+			<wsdl:input message="poscequ:consultarJanusRequestMsg"/>
+			<wsdl:output message="poscequ:consultarJanusResponseMsg"/>
+			<wsdl:fault message="poscequ:claroFault" name="claroFault"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultarServicio">
+			<wsdl:input message="poscequ:consultarServicioRequestMsg"/>
+			<wsdl:output message="poscequ:consultarServicioResponseMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultarSeaChange">
+			<wsdl:input message="poscequ:consultarSeaChangeRequestMsg"/>
+			<wsdl:output message="poscequ:consultarSeaChangeResponseMsg"/>
+			<wsdl:fault message="poscequ:claroFault" name="claroFault"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultarInteraccionCasos">
+			<wsdl:input message="poscequ:consultarInteraccionCasosRequestMsg"/>
+			<wsdl:output message="poscequ:consultarInteraccionCasosResponseMsg"/>
+			<wsdl:fault message="poscequ:claroFault" name="claroFault"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultarFalla">
+			<wsdl:input message="poscequ:consultarFallaRequestMsg"/>
+			<wsdl:output message="poscequ:consultarFallaResponseMsg"/>
+			<wsdl:fault message="poscequ:claroFault" name="claroFault"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultarEquipo">
+			<wsdl:input message="poscequ:consultarEquipoRequestMsg"/>
+			<wsdl:output message="poscequ:consultarEquipoResponseMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="consultarRegla">
+			<wsdl:input message="poscequ:consultarReglaRequestMsg"/>
+			<wsdl:output message="poscequ:consultarReglaResponseMsg"/>
+			<wsdl:fault message="poscequ:claroFault" name="claroFault"/>
+		</wsdl:operation>
+		<wsdl:operation name="reconectarNcos">
+			<wsdl:input message="poscequ:reconectarNcosRequestMsg"/>
+			<wsdl:output message="poscequ:reconectarNcosResponseMsg"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<!-- SOAP version 1.1 -->
+	<wsdl:binding name="ConsultaClienteCESPortTypeSOAP11Binding" type="poscequ:ConsultaClienteCESWSPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="consultarCliente">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarCliente"/>
+			<wsdl:input>
+				<soap:body use="literal" parts="consultarClienteRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" parts="consultarClienteResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarClientePorNombre">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarClientePorNombre"/>
+			<wsdl:input>
+				<soap:body use="literal" parts="consultarClientePorNombreRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" parts="consultarClientePorNombreResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarSucursalDetalle">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarSucursalDetalle"/>
+			<wsdl:input>
+				<soap:body use="literal" parts="consultarSucursalDetalleRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" parts="consultarSucursalDetalleResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarJanus">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarJanus"/>
+			<wsdl:input>
+				<soap:header message="poscequ:headerRequest" part="headerRequest" use="literal"/>
+				<soap:body use="literal" parts="consultarJanusRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="poscequ:headerResponse" part="headerResponse" use="literal"/>
+				<soap:body use="literal" parts="consultarJanusResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarServicio">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarServicio"/>
+			<wsdl:input>
+				<soap:body use="literal" parts="consultarServicioRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" parts="consultarServicioResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarSeaChange">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarSeaChange"/>
+			<wsdl:input>
+				<soap:header message="poscequ:headerRequest" part="headerRequest" use="literal"/>
+				<soap:body use="literal" parts="consultarSeaChangeRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="poscequ:headerResponse" part="headerResponse" use="literal"/>
+				<soap:body use="literal" parts="consultarSeaChangeResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarInteraccionCasos">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarInteraccionCasos"/>
+			<wsdl:input>
+				<soap:body use="literal" parts="consultarInteraccionCasosRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" parts="consultarInteraccionCasosResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarFalla">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarFalla"/>
+			<wsdl:input>
+				<soap:body use="literal" parts="consultarFallaRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" parts="consultarFallaResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarEquipo">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarEquipo"/>
+			<wsdl:input>
+				<soap:body use="literal" parts="consultarEquipoRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" parts="consultarEquipoResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarRegla">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarRegla"/>
+			<wsdl:input>
+				<soap:header message="poscequ:headerRequest" part="headerRequest" use="literal"/>
+				<soap:body use="literal" parts="consultarReglaRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:header message="poscequ:headerResponse" part="headerResponse" use="literal"/>
+				<soap:body use="literal" parts="consultarReglaResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="reconectarNcos">
+			<soap:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/reconectarNcos"/>
+			<wsdl:input>
+				<soap:body use="literal" parts="reconectarNcosRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" parts="reconectarNcosResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<!-- SOAP version 1.2 -->
+	<wsdl:binding name="ConsultaClienteCESPortTypeSOAP12Binding" type="poscequ:ConsultaClienteCESWSPortType">
+		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="consultarCliente">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarCliente"/>
+			<wsdl:input>
+				<soap12:body use="literal" parts="consultarClienteRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" parts="consultarClienteResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarClientePorNombre">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarClientePorNombre"/>
+			<wsdl:input>
+				<soap12:body use="literal" parts="consultarClientePorNombreRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" parts="consultarClientePorNombreResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarSucursalDetalle">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarSucursalDetalle"/>
+			<wsdl:input>
+				<soap12:body use="literal" parts="consultarSucursalDetalleRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" parts="consultarSucursalDetalleResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarJanus">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarJanus"/>
+			<wsdl:input>
+				<soap12:header message="poscequ:headerRequest" part="headerRequest" use="literal"/>
+				<soap12:body use="literal" parts="consultarJanusRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:header message="poscequ:headerResponse" part="headerResponse" use="literal"/>
+				<soap12:body use="literal" parts="consultarJanusResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarServicio">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarServicio"/>
+			<wsdl:input>
+				<soap12:body use="literal" parts="consultarServicioRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" parts="consultarServicioResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarSeaChange">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarSeaChange"/>
+			<wsdl:input>
+				<soap12:header message="poscequ:headerRequest" part="headerRequest" use="literal"/>
+				<soap12:body use="literal" parts="consultarSeaChangeRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:header message="poscequ:headerResponse" part="headerResponse" use="literal"/>
+				<soap12:body use="literal" parts="consultarSeaChangeResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarInteraccionCasos">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarInteraccionCasos"/>
+			<wsdl:input>
+				<soap12:body use="literal" parts="consultarInteraccionCasosRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" parts="consultarInteraccionCasosResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarFalla">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarFalla"/>
+			<wsdl:input>
+				<soap12:body use="literal" parts="consultarFallaRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" parts="consultarFallaResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarEquipo">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarEquipo"/>
+			<wsdl:input>
+				<soap12:body use="literal" parts="consultarEquipoRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" parts="consultarEquipoResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="consultarRegla">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/consultarRegla"/>
+			<wsdl:input>
+				<soap12:header message="poscequ:headerRequest" part="headerRequest" use="literal"/>
+				<soap12:body use="literal" parts="consultarReglaRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:header message="poscequ:headerResponse" part="headerResponse" use="literal"/>
+				<soap12:body use="literal" parts="consultarReglaResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="reconectarNcos">
+			<soap12:operation style="document" soapAction="http://claro.com.pe/eai/postventa/consultaclientecesws/reconectarNcos"/>
+			<wsdl:input>
+				<soap12:body use="literal" parts="reconectarNcosRequestMsg"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" parts="reconectarNcosResponseMsg"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<wsdl:service name="ConsultaClienteCESWSService">
+		<wsdl:port name="ebsconsultaClienteCESSB11" binding="poscequ:ConsultaClienteCESPortTypeSOAP11Binding">
+			<soap:address location="http://127.0.0.1:7001/consultaclientecesws/ebsconsultaClienteCESSB11"/>
+		</wsdl:port>
+		<wsdl:port name="ebsconsultaClienteCESSB12" binding="poscequ:ConsultaClienteCESPortTypeSOAP12Binding">
+			<soap12:address location="http://127.0.0.1:7001/consultaclientecesws/ebsconsultaClienteCESSB12"/>
+		</wsdl:port>
+	</wsdl:service>
+
+</wsdl:definitions>

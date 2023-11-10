@@ -25,4 +25,7 @@
 	<jee:jndi-lookup id="clarifyDS" jndi-name="${bd.clarify.jndi}"
 		lookup-on-startup="false" proxy-interface="javax.sql.DataSource" />
 
+	<jee:jndi-lookup id="pvuDS" jndi-name="${bd.pvu.jndi}"
+		lookup-on-startup="false" proxy-interface="javax.sql.DataSource" />
+
 </beans>
