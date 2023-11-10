@@ -10,10 +10,6 @@
 	<packaging>war</packaging>
 	<name>ConsultaClienteCESWS</name>
 
-	<properties>
-		<spring.version>3.1.2.RELEASE</spring.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>pe.com.claro</groupId>
