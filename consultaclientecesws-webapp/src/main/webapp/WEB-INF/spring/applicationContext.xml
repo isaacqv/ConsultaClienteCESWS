@@ -18,5 +18,6 @@
 	<context:property-placeholder location="file:${claro.properties}ConsultaClienteCESWS/.properties" />
 
 	<import resource="applicationDatasource.xml" />
+	<import resource="applicationProxyWs.xml" />
 
 </beans>

@@ -31,7 +31,7 @@ public class Utilitarios {
 	}
 	
 	public static Object isNullOrBlankToObjectInteger(Object object) {
-	    return (object == null) ? Integer.valueOf(-1) : object;
+		return object == null ? -1 : object;
 	}
 
 	public Date isNullOrBlankToDate(java.util.Date cadena) {
@@ -52,16 +52,11 @@ public class Utilitarios {
 
 		String patron[] = ListaValores.split(separador);
 		boolean rtpa = false;
-		byte b;
-	    int i;
-	    String[] arrayOfString1;
-	    for (i = (arrayOfString1 = patron).length, b = 0; b < i; ) {
-	      String arg = arrayOfString1[b];
+		for (String arg : patron) {
 			if (cadena.contains(arg)) {
 				rtpa = true;
 				break;
 			}
-			b++;
 		}
 		return rtpa;
 

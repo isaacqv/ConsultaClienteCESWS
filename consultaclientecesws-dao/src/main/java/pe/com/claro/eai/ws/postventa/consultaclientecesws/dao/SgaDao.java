@@ -28,11 +28,14 @@ import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicio
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioSucursalResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGARequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGAResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ObtenerDatosClienteResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosRequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.RegistrarAuditoriaRequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.RegistrarAuditoriaResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.DBException;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarNumeroTelefonoRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarNumeroTelefonoResponse;
 
 public interface SgaDao {
 
@@ -43,6 +46,7 @@ public interface SgaDao {
 	ConsultarJanusResponse consultarJanus(String mensajeTransaccion, ConsultarJanusRequest objConsultarJanusRequest) throws DBException;
 	RegistrarAuditoriaResponse registrarAuditoria(String mensajeTransaccion, RegistrarAuditoriaRequest objRegistrarAuditoriaRequest) throws DBException;
 	ConsultarServicioResponse consultarServicio(String mensajeTransaccion, ConsultarServicioRequest objConsultarServicioRequest) throws DBException;
+	ObtenerDatosClienteResponse obtenerDatosCliente(String mensajeTransaccion, String i_codId) throws DBException;
 	ConsultarSeaChangeResponse consultarSeaChange(String mensajeTransaccion, ConsultarSeaChangeRequest objConsultarSeaChangeRequest) throws DBException;
 	ConsultarInteraccionCasosResponse consultarSot(String mensajeTransaccion, ConsultarInteraccionCasosRequest objConsultarInteraccionCasosRequest) throws DBException;
 	ConsultarInteraccionCasosResponse consultarIncidencia(String mensajeTransaccion, ConsultarInteraccionCasosRequest objConsultarInteraccionCasosRequest) throws DBException;
@@ -60,5 +64,6 @@ public interface SgaDao {
 	ConsultarClienteResponse consultarClienteComplemento(String mensajeTransaccion, ConsultarClienteRequest objConsultarClienteRequest) throws DBException;
 	String obtenerNumeroDocumento(String mensajeTransaccion, String strCodCli) throws DBException;
 	ConsultarClientePorNombreResponse consultarClientePorNombre(String mensajeTransaccion, ConsultarClientePorNombreRequest objConsultarClientePorNombreRequest) throws DBException;
-	ConsultarTecnologiaSGAResponse consultarTecnologia(String paramString, ConsultarTecnologiaSGARequest paramConsultarTecnologiaSGARequest) throws DBException;
+	ConsultarTecnologiaSGAResponse consultarTecnologia(String mensajeTransaccion, ConsultarTecnologiaSGARequest objConsultarTecnologiaSGARequest) throws DBException;
+	ConsultarNumeroTelefonoResponse consultarNumeroTelefono(String mensajeTransaccion, ConsultarNumeroTelefonoRequest objConsultarNumeroTelefonoRequest) throws DBException;
 }

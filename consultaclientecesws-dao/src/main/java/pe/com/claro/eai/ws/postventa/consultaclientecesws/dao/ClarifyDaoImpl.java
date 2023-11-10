@@ -1,5 +1,6 @@
 package pe.com.claro.eai.ws.postventa.consultaclientecesws.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosInfVar;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosProblema;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaDatosInfVar;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaDatosProblema;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.util.Utilitario;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.DBException;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Constantes;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.PropertiesInternos;
@@ -51,14 +53,15 @@ public class ClarifyDaoImpl implements ClarifyDao {
 	public ConsultarInteraccionCasosResponse consultarInformacionVariacion(String mensajeTransaccion,
 			ConsultarInteraccionCasosRequest objConsultarInteraccionCasosRequest) throws DBException {
 		String metodo = "consultarInformacionVariacion";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarInteraccionCasosResponse response = new ConsultarInteraccionCasosResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbCLARIFYDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_CLARIFY + "]");
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbCLARIFYDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_CLARIFY + "]");
 			clarifyDS.setLoginTimeout(this.propiedadesExterna.dbClarifyDBLoginTimeout);
-
+			conexion = clarifyDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(clarifyDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(this.propiedadesExterna.dbCLARIFYDBOwner)
@@ -113,13 +116,13 @@ public class ClarifyDaoImpl implements ClarifyDao {
 				// HFC, LTE
 				strPhone = Constantes.IDENTIFICADOR_FIJO + objConsultarInteraccionCasosRequest.getCustomerId();
 			}
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbCLARIFYDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pckInteractClfyHfc).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spQuery_interact_hfc));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[P_PHONE] = " + strPhone);
-			logger.info(String.valueOf(mensajeLog) + "[P_ACCOUNT] = ");
-			logger.info(String.valueOf(mensajeLog) + "[P_SITEOBJID_1] = ");
-			logger.info(String.valueOf(mensajeLog) + "[P_CONTACTOBJID_1] = ");
-			logger.info(String.valueOf(mensajeLog) + "[P_TIPIFICACION] = ");
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbCLARIFYDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pckInteractClfyHfc).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spQuery_interact_hfc));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[P_PHONE] = " + strPhone);
+			logger.info(mensajeLog + "[P_ACCOUNT] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "[P_SITEOBJID_1] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "[P_CONTACTOBJID_1] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "[P_TIPIFICACION] = " + PropertiesInternos.STRING_EMPTY);
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("P_PHONE", strPhone)
@@ -131,9 +134,9 @@ public class ClarifyDaoImpl implements ClarifyDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_CLARIFY);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[FLAG_CREACION] = " + resultMap.get("FLAG_CREACION"));
-			logger.info(String.valueOf(mensajeLog) + "[MSG_TEXT] = " + resultMap.get("MSG_TEXT"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[FLAG_CREACION] = " + resultMap.get("FLAG_CREACION"));
+			logger.info(mensajeLog + "[MSG_TEXT] = " + resultMap.get("MSG_TEXT"));
 
 			ListaDatosInfVar listaDatosInfVar = new ListaDatosInfVar();
 			
@@ -142,9 +145,9 @@ public class ClarifyDaoImpl implements ClarifyDao {
 			response.setListDatosInfVar(listaDatosInfVar);
 			response.setCodRespuesta(Utilitarios.isNullOrBlankToString(resultMap.get("FLAG_CREACION")));
 			response.setMsgRespuesta(Utilitarios.isNullOrBlankToString(resultMap.get("MSG_TEXT")));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad interact] = " + (listaDatosInfVar.getListDatosInfVar().size()));
+			logger.info(mensajeLog + "[Cantidad interact] = " + (listaDatosInfVar.getListDatosInfVar().size()));
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -156,9 +159,15 @@ public class ClarifyDaoImpl implements ClarifyDao {
 				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbCLARIFYDB).replace("$sp", propiedadesExterna.spQuery_interact_hfc).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -167,14 +176,15 @@ public class ClarifyDaoImpl implements ClarifyDao {
 	public ConsultarInteraccionCasosResponse consultarProblemas(String mensajeTransaccion,
 			ConsultarInteraccionCasosRequest objConsultarInteraccionCasosRequest) throws DBException {
 		String metodo = "consultarProblemas";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarInteraccionCasosResponse response = new ConsultarInteraccionCasosResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbCLARIFYDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_CLARIFY + "]");
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbCLARIFYDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_CLARIFY + "]");
 			clarifyDS.setLoginTimeout(this.propiedadesExterna.dbClarifyDBLoginTimeout);
-
+			conexion = clarifyDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(clarifyDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(this.propiedadesExterna.dbCLARIFYDBOwner)
@@ -246,17 +256,17 @@ public class ClarifyDaoImpl implements ClarifyDao {
 				}
 			}
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbCLARIFYDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pckCaseClfyHfc).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spQuery_case_hfc));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[ACCOUNT] = " + PropertiesInternos.STRING_EMPTY);
-			logger.info(String.valueOf(mensajeLog) + "[TELEPHONE] = " + strPhone);
-			logger.info(String.valueOf(mensajeLog) + "[CONTACT_OBJID1] = " + PropertiesInternos.STRING_EMPTY);
-			logger.info(String.valueOf(mensajeLog) + "[TIPIFICACION] = " + PropertiesInternos.STRING_EMPTY);
-			logger.info(String.valueOf(mensajeLog) + "[ESTADO] = " + PropertiesInternos.STRING_EMPTY);
-			logger.info(String.valueOf(mensajeLog) + "[P_SERVICE] = " + srtService);
-			logger.info(String.valueOf(mensajeLog) + "[P_TIPO_QUERY] = " + PropertiesInternos.STRING_EMPTY);
-			logger.info(String.valueOf(mensajeLog) + "[P_FECHA_INICIO] = " + PropertiesInternos.STRING_EMPTY);
-			logger.info(String.valueOf(mensajeLog) + "[P_FECHA_FIN] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbCLARIFYDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pckCaseClfyHfc).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spQuery_case_hfc));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[ACCOUNT] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "[TELEPHONE] = " + strPhone);
+			logger.info(mensajeLog + "[CONTACT_OBJID1] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "[TIPIFICACION] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "[ESTADO] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "[P_SERVICE] = " + srtService);
+			logger.info(mensajeLog + "[P_TIPO_QUERY] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "[P_FECHA_INICIO] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "[P_FECHA_FIN] = " + PropertiesInternos.STRING_EMPTY);
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("ACCOUNT", PropertiesInternos.NULL)
@@ -272,30 +282,30 @@ public class ClarifyDaoImpl implements ClarifyDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_CLARIFY);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[P_FLAG_CONSULTA] = " + resultMap.get("P_FLAG_CONSULTA"));
-			logger.info(String.valueOf(mensajeLog) + "[P_MSG_TEXT] = " + resultMap.get("P_MSG_TEXT"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[P_FLAG_CONSULTA] = " + resultMap.get("P_FLAG_CONSULTA"));
+			logger.info(mensajeLog + "[P_MSG_TEXT] = " + resultMap.get("P_MSG_TEXT"));
 
 			ListaDatosProblema listaDatosProblema = new ListaDatosProblema();
 			response.setCodRespuesta(Utilitarios.isNullOrBlankToString(resultMap.get("P_FLAG_CONSULTA")));
 			
 			listaDatosProblema.setListDatosProblema((List<DatosProblema>) Optional.ofNullable(resultMap.get("OUT_CURSOR")).orElse(Collections.emptyList()));
 			
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad OUT_CURSOR] = " + listaDatosProblema.getListDatosProblema().size());
+			logger.info(mensajeLog + "[Cantidad OUT_CURSOR] = " + listaDatosProblema.getListDatosProblema().size());
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			
 			if (!listaDatosProblema.getListDatosProblema().isEmpty()) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+				logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 				response.setListDatosProblema(listaDatosProblema);
 				mensaje = Utilitarios.isNullOrBlankToString(resultMap.get("P_MSG_TEXT"));
 			} else {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+				logger.info(mensajeLog + Constantes.LISTA_VACIA);
 				mensaje = Constantes.CURSOR_VACIO;
 			}			
 			response.setMsgRespuesta(mensaje);
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -307,9 +317,15 @@ public class ClarifyDaoImpl implements ClarifyDao {
 				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbCLARIFYDB).replace("$sp", propiedadesExterna.spQuery_interact_hfc).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 

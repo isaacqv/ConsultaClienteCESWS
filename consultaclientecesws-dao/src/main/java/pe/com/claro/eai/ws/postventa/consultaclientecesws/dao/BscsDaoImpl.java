@@ -1,5 +1,6 @@
 package pe.com.claro.eai.ws.postventa.consultaclientecesws.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
@@ -34,6 +36,8 @@ import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoRe
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioRequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarSucursalDetalleRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarSucursalDetalleResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaRequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Equipo;
@@ -42,7 +46,9 @@ import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaClientePorNo
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaServicio;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaSucursal;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Servicio;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Sucursal;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Tecnologia;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.util.Utilitario;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.DBException;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Constantes;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.PropertiesInternos;
@@ -64,14 +70,15 @@ public class BscsDaoImpl implements BscsDao {
 	@Override
 	public ConsultarClienteResponse consultarCliente(String mensajeTransaccion, ConsultarClienteRequest objConsultarClienteRequest) throws DBException {
 		String metodo = "consultarCliente";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarClienteResponse response = new ConsultarClienteResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbBSCSDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_BSCS + "]");
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbBSCSDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_BSCS + "]");
 			bscsDS.setLoginTimeout(this.propiedadesExterna.dbBscsDBLoginTimeout);
-
+			conexion = bscsDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(bscsDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(this.propiedadesExterna.dbBSCSDBOwner)
@@ -110,10 +117,10 @@ public class BscsDaoImpl implements BscsDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailureBSCS).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_customerBSCS));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[aiv_typesearch] = " + objConsultarClienteRequest.getTipoBusqueda());
-			logger.info(String.valueOf(mensajeLog) + "[aiv_stringsearch] = " + objConsultarClienteRequest.getValorBusqueda());
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailureBSCS).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_customerBSCS));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[aiv_typesearch] = " + objConsultarClienteRequest.getTipoBusqueda());
+			logger.info(mensajeLog + "[aiv_stringsearch] = " + objConsultarClienteRequest.getValorBusqueda());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("aiv_typesearch", objConsultarClienteRequest.getTipoBusqueda())
@@ -122,25 +129,25 @@ public class BscsDaoImpl implements BscsDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_BSCS);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[aon_sourceout] = " + resultMap.get("aon_sourceout"));
-			logger.info(String.valueOf(mensajeLog) + "[aov_message] = " + resultMap.get("aov_message"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[aon_sourceout] = " + resultMap.get("aon_sourceout"));
+			logger.info(mensajeLog + "[aov_message] = " + resultMap.get("aov_message"));
 
 			ListaCliente listaCliente = new ListaCliente();
 			response.setCodRespuesta(resultMap.get("aon_sourceout") != null ? resultMap.get("aon_sourceout").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaCliente.setListCliente((List<Cliente>) resultMap.get("aoc_refcursorcliente"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad aoc_refcursorcliente] = " + (listaCliente.getListCliente() != null ? listaCliente.getListCliente().size() : 0));
+			logger.info(mensajeLog + "[Cantidad aoc_refcursorcliente] = " + (listaCliente.getListCliente() != null ? listaCliente.getListCliente().size() : 0));
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			if (listaCliente.getListCliente() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
+				logger.info(mensajeLog + Constantes.LISTA_NO_NULA);
 				if (!listaCliente.getListCliente().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListCliente(listaCliente);
 					mensaje = resultMap.get("aov_message") != null ? resultMap.get("aov_message").toString() : PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -148,7 +155,7 @@ public class BscsDaoImpl implements BscsDao {
 			}
 			response.setMsgRespuesta(mensaje);
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -160,23 +167,30 @@ public class BscsDaoImpl implements BscsDao {
 				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbBSCSDB).replace("$sp", propiedadesExterna.spSicess_customerBSCS).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
 	@Override
 	public ConsultarClientePorNombreResponse consultarClientePorNombre(String mensajeTransaccion, ConsultarClientePorNombreRequest objConsultarClientePorNombreRequest) throws DBException {
 		String metodo = "consultarClientePorNombre";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarClientePorNombreResponse response = new ConsultarClientePorNombreResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbBSCSDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_BSCS + "]");
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbBSCSDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_BSCS + "]");
 			bscsDS.setLoginTimeout(this.propiedadesExterna.dbBscsDBLoginTimeout);
-
+			conexion = bscsDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(bscsDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(this.propiedadesExterna.dbBSCSDBOwner)
@@ -198,10 +212,10 @@ public class BscsDaoImpl implements BscsDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailureBSCS).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_customer_rs_nom));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[aiv_typesearch] = " + objConsultarClientePorNombreRequest.getTipobusqueda());
-			logger.info(String.valueOf(mensajeLog) + "[aiv_stringsearch] = " + objConsultarClientePorNombreRequest.getValor_busqueda());
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailureBSCS).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_customer_rs_nom));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[aiv_typesearch] = " + objConsultarClientePorNombreRequest.getTipobusqueda());
+			logger.info(mensajeLog + "[aiv_stringsearch] = " + objConsultarClientePorNombreRequest.getValor_busqueda());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("aiv_typesearch", objConsultarClientePorNombreRequest.getTipobusqueda())
@@ -210,25 +224,25 @@ public class BscsDaoImpl implements BscsDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_BSCS);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[aon_sourceout] = " + resultMap.get("aon_sourceout"));
-			logger.info(String.valueOf(mensajeLog) + "[aov_message] = " + resultMap.get("aov_message"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[aon_sourceout] = " + resultMap.get("aon_sourceout"));
+			logger.info(mensajeLog + "[aov_message] = " + resultMap.get("aov_message"));
 
 			ListaClientePorNombre listaClientePorNombre = new ListaClientePorNombre();
 			response.setCodRespuesta(resultMap.get("aon_sourceout") != null ? resultMap.get("aon_sourceout").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaClientePorNombre.setListClientePorNombre((List<ClientePorNombre>) resultMap.get("aoc_refcursorcliente"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad aoc_refcursorcliente] = " + (listaClientePorNombre.getListClientePorNombre() != null ? listaClientePorNombre.getListClientePorNombre().size() : 0));
+			logger.info(mensajeLog + "[Cantidad aoc_refcursorcliente] = " + (listaClientePorNombre.getListClientePorNombre() != null ? listaClientePorNombre.getListClientePorNombre().size() : 0));
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			if (listaClientePorNombre.getListClientePorNombre() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
+				logger.info(mensajeLog + Constantes.LISTA_NO_NULA);
 				if (!listaClientePorNombre.getListClientePorNombre().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListClientePorNombre(listaClientePorNombre);
 					mensaje = resultMap.get("aov_message") != null ? resultMap.get("aov_message").toString() : PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -236,7 +250,7 @@ public class BscsDaoImpl implements BscsDao {
 			}
 			response.setMsgRespuesta(mensaje);
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -248,9 +262,15 @@ public class BscsDaoImpl implements BscsDao {
 				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbBSCSDB).replace("$sp", propiedadesExterna.spSicess_customer_rs_nom).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -259,14 +279,17 @@ public class BscsDaoImpl implements BscsDao {
 	public ConsultarTecnologiaResponse consultarTecnologia(String mensajeTransaccion,
 			ConsultarTecnologiaRequest objConsultarTecnologiaRequest) throws DBException {
 		String metodo = "consultarTecnologia";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarTecnologiaResponse objResponse = new ConsultarTecnologiaResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		
 		List<Tecnologia> listaTecnologia = new ArrayList<>();
+		Connection conexion =null;
 		try {
 			
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + propiedadesExterna.dbBSCSDB + ", con JNDI = [" + propiedadesExterna.cJNDI_BSCS + "]");
+			logger.info(mensajeLog + "Consultando BD " + propiedadesExterna.dbBSCSDB + ", con JNDI = [" + propiedadesExterna.cJNDI_BSCS + "]");
 			bscsDS.setLoginTimeout(propiedadesExterna.dbBscsDBLoginTimeout);
+			conexion  = bscsDS.getConnection();
 			String outCursor = "PO_REFCURSORTECNO";
 
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(bscsDS)
@@ -295,9 +318,9 @@ public class BscsDaoImpl implements BscsDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailureBSCS).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_tecnologia));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objConsultarTecnologiaRequest.toString());
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailureBSCS).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_tecnologia));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + objConsultarTecnologiaRequest.toString());
 
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_BSCS);
 			
@@ -311,10 +334,10 @@ public class BscsDaoImpl implements BscsDao {
 			objResponse.setPo_message(Utilitarios.isNullOrBlankToString(resultMap.get("PO_MESSAGE")));
 			objResponse.setListaTecnologia(listaTecnologia);
 			
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objResponse.toString());
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + objResponse.toString());
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -326,6 +349,12 @@ public class BscsDaoImpl implements BscsDao {
 				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbBSCSDB).replace("$sp", propiedadesExterna.spSicess_tecnologia).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 		return objResponse;
 	}
@@ -337,11 +366,12 @@ public class BscsDaoImpl implements BscsDao {
 		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarServicioResponse response = new ConsultarServicioResponse();
 		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
-
+		Connection conexion =null;
 		try {
+			
 			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbBSCSDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_BSCS + "]");
 			bscsDS.setLoginTimeout(this.propiedadesExterna.dbBscsDBLoginTimeout);
-
+			conexion  = bscsDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(bscsDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(this.propiedadesExterna.dbBSCSDBOwner)
@@ -365,9 +395,9 @@ public class BscsDaoImpl implements BscsDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailureBSCS).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_servicebscs));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[pi_i_contracid] = " + objConsultarServicioRequest.getCo_id());
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailureBSCS).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_servicebscs));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[pi_i_contracid] = " + objConsultarServicioRequest.getCo_id());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("pi_i_contracid", objConsultarServicioRequest.getCo_id());
@@ -375,25 +405,25 @@ public class BscsDaoImpl implements BscsDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_BSCS);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[po_code_result] = " + resultMap.get("po_code_result"));
-			logger.info(String.valueOf(mensajeLog) + "[po_message_result] = " + resultMap.get("po_message_result"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[po_code_result] = " + resultMap.get("po_code_result"));
+			logger.info(mensajeLog + "[po_message_result] = " + resultMap.get("po_message_result"));
 
 			ListaServicio listaServicio = new ListaServicio();
 			response.setCodRespuesta(resultMap.get("po_code_result") != null ? resultMap.get("po_code_result").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaServicio.setListServicio((List<Servicio>) resultMap.get("po_cursor"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad po_cursor] = " + (listaServicio.getListServicio() != null ? listaServicio.getListServicio().size() : 0));
+			logger.info(mensajeLog + "[Cantidad po_cursor] = " + (listaServicio.getListServicio() != null ? listaServicio.getListServicio().size() : 0));
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			if (listaServicio.getListServicio() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
+				logger.info(mensajeLog + Constantes.LISTA_NO_NULA);
 				if (!listaServicio.getListServicio().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListServicio(listaServicio);
 					mensaje = resultMap.get("po_message_result") != null ? resultMap.get("po_message_result").toString() : PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -413,9 +443,15 @@ public class BscsDaoImpl implements BscsDao {
 				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbBSCSDB).replace("$sp", propiedadesExterna.spSicess_servicebscs).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -423,14 +459,15 @@ public class BscsDaoImpl implements BscsDao {
 	public ConsultarEquipoResponse consultarEquipoCable(String mensajeTransaccion,
 			ConsultarEquipoRequest objConsultarEquipoRequest) throws DBException {
 		String metodo = "consultarEquipoCable";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarEquipoResponse response = new ConsultarEquipoResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbBSCSDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_BSCS + "]");
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbBSCSDB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_BSCS + "]");
 			bscsDS.setLoginTimeout(this.propiedadesExterna.dbBscsDBLoginTimeout);
-
+			conexion = bscsDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(bscsDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(this.propiedadesExterna.dbBSCSDBOwner)
@@ -452,10 +489,10 @@ public class BscsDaoImpl implements BscsDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgProvDth).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spConsultaDeco));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[p_co_id] = " + objConsultarEquipoRequest.getCoId());
-			logger.info(String.valueOf(mensajeLog) + "[p_msisdn] = " + PropertiesInternos.STRING_EMPTY);
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbBSCSDBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgProvDth).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spConsultaDeco));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[p_co_id] = " + objConsultarEquipoRequest.getCoId());
+			logger.info(mensajeLog + "[p_msisdn] = " + PropertiesInternos.STRING_EMPTY);
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("p_co_id", objConsultarEquipoRequest.getCoId())
@@ -464,10 +501,10 @@ public class BscsDaoImpl implements BscsDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_BSCS);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[p_resultado] = " + resultMap.get("p_resultado"));
-			logger.info(String.valueOf(mensajeLog) + "[p_msgerr] = " + resultMap.get("p_msgerr"));
-                                                 
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[p_resultado] = " + resultMap.get("p_resultado"));
+			logger.info(mensajeLog + "[p_msgerr] = " + resultMap.get("p_msgerr"));
+
 			
 			response.setCodRespuesta(resultMap.get("p_resultado") != null ? resultMap.get("p_resultado").toString() : PropertiesInternos.STRING_EMPTY);
 			response.setMsgRespuesta(resultMap.get("p_msgerr") != null ? resultMap.get("p_msgerr").toString() : PropertiesInternos.STRING_EMPTY);
@@ -476,10 +513,10 @@ public class BscsDaoImpl implements BscsDao {
 				@SuppressWarnings("unchecked")
 				List<Equipo> listaEquipo = (List<Equipo>) resultMap.get("p_cursor");
 				response.setListEquipo(listaEquipo);
-				logger.info(String.valueOf(mensajeLog) + "[Cantidad p_cursor] = " + (listaEquipo != null ? listaEquipo.size() : 0));
+				logger.info(mensajeLog + "[Cantidad p_cursor] = " + (listaEquipo != null ? listaEquipo.size() : 0));
 			}
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -491,10 +528,15 @@ public class BscsDaoImpl implements BscsDao {
 				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbBSCSDB).replace("$sp", propiedadesExterna.spConsultaDeco).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
-
 }

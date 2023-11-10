@@ -90,6 +90,7 @@
 			<xsd:element name="correspElectronica" type="xsd:string"/>
 			<xsd:element name="codSuc" type="xsd:string"/>
 			<xsd:element name="numSlc" type="xsd:string"/>
+			<xsd:element name="flagToBe" type="xsd:string"/>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -144,32 +145,32 @@
 
 	<xsd:complexType name="SucursalType">
 		<xsd:sequence>
-			<xsd:element name="tecnologia" type="xsd:string"/>
-			<xsd:element name="customerid" type="xsd:string"/>
-			<xsd:element name="co_id" type="xsd:string"/>
-			<xsd:element name="numero" type="xsd:string"/>
-			<xsd:element name="codigoPago" type="xsd:string"/>
-			<xsd:element name="estado" type="xsd:string"/>
-			<xsd:element name="motivoEstado" type="xsd:string"/>
-			<xsd:element name="codcli" type="xsd:string"/>
-			<xsd:element name="codsuc" type="xsd:string"/>
-			<xsd:element name="codsolot" type="xsd:string"/>
-			<xsd:element name="direccion" type="xsd:string"/>
-			<xsd:element name="plano" type="xsd:string"/>
-			<xsd:element name="ubigeo" type="xsd:string"/>
-			<xsd:element name="departamento" type="xsd:string"/>
-			<xsd:element name="provincia" type="xsd:string"/>
-			<xsd:element name="distrito" type="xsd:string"/>
-			<xsd:element name="internet" type="xsd:string"/>
-			<xsd:element name="telefonia" type="xsd:string"/>
-			<xsd:element name="cable" type="xsd:string"/>
-			<xsd:element name="faspid" type="xsd:string"/>
-			<xsd:element name="faspmessage" type="xsd:string"/>
-			<xsd:element name="seraffected" type="xsd:string"/>
+			<xsd:element name="tecnologia" type="xsd:string" nillable="true"/>
+			<xsd:element name="customerid" type="xsd:string" nillable="true"/>
+			<xsd:element name="co_id" type="xsd:string" nillable="true"/>
+			<xsd:element name="numero" type="xsd:string" nillable="true"/>
+			<xsd:element name="codigoPago" type="xsd:string" nillable="true"/>
+			<xsd:element name="estado" type="xsd:string" nillable="true"/>
+			<xsd:element name="motivoEstado" type="xsd:string" nillable="true"/>
+			<xsd:element name="codcli" type="xsd:string" nillable="true"/>
+			<xsd:element name="codsuc" type="xsd:string" nillable="true"/>
+			<xsd:element name="codsolot" type="xsd:string" nillable="true"/>
+			<xsd:element name="direccion" type="xsd:string" nillable="true"/>
+			<xsd:element name="plano" type="xsd:string" nillable="true"/>
+			<xsd:element name="ubigeo" type="xsd:string" nillable="true"/>
+			<xsd:element name="departamento" type="xsd:string" nillable="true"/>
+			<xsd:element name="provincia" type="xsd:string" nillable="true"/>
+			<xsd:element name="distrito" type="xsd:string" nillable="true"/>
+			<xsd:element name="internet" type="xsd:string" nillable="true"/>
+			<xsd:element name="telefonia" type="xsd:string" nillable="true"/>
+			<xsd:element name="cable" type="xsd:string" nillable="true"/>
+			<xsd:element name="faspid" type="xsd:string" nillable="true"/>
+			<xsd:element name="faspmessage" type="xsd:string" nillable="true"/>
+			<xsd:element name="seraffected" type="xsd:string" nillable="true"/>
 			<xsd:element name="listaServicioSucursal" type="encequv1:listaServicioSucursalType" />
-			<xsd:element name="flgPortable" type="xsd:string"/>
-			<xsd:element name="numSlc" type="xsd:string"/>
-			<xsd:element name="plataforma" type="xsd:string"/>
+			<xsd:element name="flgPortable" type="xsd:string" nillable="true"/>
+			<xsd:element name="numSlc" type="xsd:string" nillable="true"/>
+			<xsd:element name="plataforma" type="xsd:string" nillable="true"/>
 		</xsd:sequence>
 	</xsd:complexType>
 	
@@ -181,9 +182,11 @@
 	
 	<xsd:complexType name="ServicioSucursalType">
 		<xsd:sequence>
-			<xsd:element name="tipoServicio" type="xsd:string"/>
-			<xsd:element name="servicio" type="xsd:string"/>
-			<xsd:element name="validoDesde" type="xsd:string"/>
+			<xsd:element name="tipoServicio" type="xsd:string" nillable="true"/>
+			<xsd:element name="codigoServicio" type="xsd:string" nillable="true"/>
+			<xsd:element name="numero" type="xsd:string" nillable="true"/>
+			<xsd:element name="servicio" type="xsd:string" nillable="true"/>
+			<xsd:element name="validoDesde" type="xsd:string" nillable="true"/>
 		</xsd:sequence>
 	</xsd:complexType>
 

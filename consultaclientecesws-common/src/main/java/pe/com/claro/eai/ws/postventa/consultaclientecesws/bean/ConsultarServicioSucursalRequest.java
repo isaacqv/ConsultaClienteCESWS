@@ -1,35 +1,39 @@
 package pe.com.claro.eai.ws.postventa.consultaclientecesws.bean;
 
-import java.io.Serializable;
+public class ConsultarServicioSucursalRequest {
 
-public class ConsultarServicioSucursalRequest implements Serializable {
+	private String pi_tecnologia;
+	private String pi_codsolot;
 
-	private static final long serialVersionUID = 1L;
-
-	private String tecnologia;
-	private String codSolot;
-	
 	public ConsultarServicioSucursalRequest() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
-	public ConsultarServicioSucursalRequest(String tecnologia, String codSolot) {
+
+	public ConsultarServicioSucursalRequest(String pi_tecnologia, String pi_codsolot) {
 		super();
-		this.tecnologia = tecnologia;
-		this.codSolot = codSolot;
+		this.pi_tecnologia = pi_tecnologia;
+		this.pi_codsolot = pi_codsolot;
 	}
-	public String getTecnologia() {
-		return tecnologia;
+
+	public String getPi_tecnologia() {
+		return pi_tecnologia;
 	}
-	public void setTecnologia(String tecnologia) {
-		this.tecnologia = tecnologia;
+
+	public void setPi_tecnologia(String pi_tecnologia) {
+		this.pi_tecnologia = pi_tecnologia;
 	}
-	public String getCodSolot() {
-		return codSolot;
+
+	public String getPi_codsolot() {
+		return pi_codsolot;
 	}
-	public void setCodSolot(String codSolot) {
-		this.codSolot = codSolot;
+
+	public void setPi_codsolot(String pi_codsolot) {
+		this.pi_codsolot = pi_codsolot;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "[pi_tecnologia=" + pi_tecnologia + ", pi_codsolot=" + pi_codsolot + "]";
+	}
+
 }

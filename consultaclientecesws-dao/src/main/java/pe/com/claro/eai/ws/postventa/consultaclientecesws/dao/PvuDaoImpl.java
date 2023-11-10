@@ -1,5 +1,6 @@
 package pe.com.claro.eai.ws.postventa.consultaclientecesws.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -25,6 +26,7 @@ import oracle.jdbc.driver.OracleTypes;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoRequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Equipo;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.util.Utilitario;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.DBException;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.PropertiesInternos;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Propiedades;
@@ -47,14 +49,15 @@ public class PvuDaoImpl implements PvuDao{
 	public ConsultarEquipoResponse consultarEquipo(String mensajeTransaccion,
 			ConsultarEquipoRequest objConsultarEquipoRequest) throws DBException {
 		String metodo = "consultarEquipo";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarEquipoResponse response = new ConsultarEquipoResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-		
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + propiedadesExterna.dbPVU + ", con JNDI = [" + propiedadesExterna.cJNDI_PVU + "]");
-			pvuDS.setLoginTimeout(propiedadesExterna.dbPVULoginTimeout);
 			
+			logger.info(mensajeLog + "Consultando BD " + propiedadesExterna.dbPVU + ", con JNDI = [" + propiedadesExterna.cJNDI_PVU + "]");
+			pvuDS.setLoginTimeout(propiedadesExterna.dbPVULoginTimeout);
+			conexion = pvuDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(pvuDS)
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(propiedadesExterna.dbPVUOwner)
@@ -73,9 +76,9 @@ public class PvuDaoImpl implements PvuDao{
 								}
 							}));
 			
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbPVUOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_equipment_ifi));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_CO_ID] = " + objConsultarEquipoRequest.getCoId());
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbPVUOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_equipment_ifi));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_CO_ID] = " + objConsultarEquipoRequest.getCoId());
 			
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("PI_CO_ID", objConsultarEquipoRequest.getCoId());
@@ -83,9 +86,9 @@ public class PvuDaoImpl implements PvuDao{
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.dbPVUExecutionTimeout);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 			
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
 			
 			List<Equipo> listaEquipos = (List<Equipo>) Optional.ofNullable(resultMap.get("PO_CURSOR_EQUIPO")).orElse(Collections.emptyList());
 			
@@ -106,7 +109,12 @@ public class PvuDaoImpl implements PvuDao{
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbPVU).replace("$sp", propiedadesExterna.spSicess_equipment_ifi).replace("$msg", error));
 		} finally {
-			logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
+			logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		}
 		return response;
 	}

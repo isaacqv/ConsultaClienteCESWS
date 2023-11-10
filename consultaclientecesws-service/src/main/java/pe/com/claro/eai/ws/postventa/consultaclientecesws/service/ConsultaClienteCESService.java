@@ -3,6 +3,7 @@ package pe.com.claro.eai.ws.postventa.consultaclientecesws.service;
 import javax.xml.ws.Holder;
 
 import pe.com.claro.eai.ws.baseschema.AuditRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.IDFException;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarClientePorNombreRequestType;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarClientePorNombreResponseType;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarClienteRequestType;

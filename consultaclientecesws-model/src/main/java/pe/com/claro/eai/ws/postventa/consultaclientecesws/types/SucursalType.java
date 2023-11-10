@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Clase Java para SucursalType complex type.
- *
+ * 
  * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
- *
+ * 
  * <pre>
  * &lt;complexType name="SucursalType">
  *   &lt;complexContent>
@@ -48,43 +48,43 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- *
- *
+ * 
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SucursalType", propOrder = {
-        "tecnologia",
-        "customerid",
-        "coId",
-        "numero",
-        "codigoPago",
-        "estado",
-        "motivoEstado",
-        "codcli",
-        "codsuc",
-        "codsolot",
-        "direccion",
-        "plano",
-        "ubigeo",
-        "departamento",
-        "provincia",
-        "distrito",
-        "internet",
-        "telefonia",
-        "cable",
-        "faspid",
-        "faspmessage",
-        "seraffected",
-        "listaServicioSucursal",
-        "flgPortable",
-        "numSlc",
-        "plataforma"
+    "tecnologia",
+    "customerid",
+    "coId",
+    "numero",
+    "codigoPago",
+    "estado",
+    "motivoEstado",
+    "codcli",
+    "codsuc",
+    "codsolot",
+    "direccion",
+    "plano",
+    "ubigeo",
+    "departamento",
+    "provincia",
+    "distrito",
+    "internet",
+    "telefonia",
+    "cable",
+    "faspid",
+    "faspmessage",
+    "seraffected",
+    "listaServicioSucursal",
+    "flgPortable",
+    "numSlc",
+    "plataforma"
 })
 public class SucursalType {
 
-    @XmlElement(nillable=true, required = true)
+	@XmlElement(nillable=true, required = true)
     protected String tecnologia;
-    @XmlElement(nillable=true, required = true)
+	@XmlElement(nillable=true, required = true)
     protected String customerid;
     @XmlElement(name = "co_id", nillable=true, required = true)
     protected String coId;
@@ -137,11 +137,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad tecnologia.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getTecnologia() {
         return tecnologia;
@@ -149,11 +149,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad tecnologia.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setTecnologia(String value) {
         this.tecnologia = value;
@@ -161,11 +161,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad customerid.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getCustomerid() {
         return customerid;
@@ -173,11 +173,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad customerid.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setCustomerid(String value) {
         this.customerid = value;
@@ -185,11 +185,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad coId.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getCoId() {
         return coId;
@@ -197,11 +197,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad coId.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setCoId(String value) {
         this.coId = value;
@@ -209,11 +209,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad numero.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getNumero() {
         return numero;
@@ -221,11 +221,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad numero.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setNumero(String value) {
         this.numero = value;
@@ -233,11 +233,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad codigoPago.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getCodigoPago() {
         return codigoPago;
@@ -245,11 +245,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad codigoPago.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setCodigoPago(String value) {
         this.codigoPago = value;
@@ -257,11 +257,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad estado.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getEstado() {
         return estado;
@@ -269,11 +269,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad estado.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setEstado(String value) {
         this.estado = value;
@@ -281,11 +281,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad motivoEstado.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getMotivoEstado() {
         return motivoEstado;
@@ -293,11 +293,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad motivoEstado.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setMotivoEstado(String value) {
         this.motivoEstado = value;
@@ -305,11 +305,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad codcli.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getCodcli() {
         return codcli;
@@ -317,11 +317,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad codcli.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setCodcli(String value) {
         this.codcli = value;
@@ -329,11 +329,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad codsuc.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getCodsuc() {
         return codsuc;
@@ -341,11 +341,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad codsuc.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setCodsuc(String value) {
         this.codsuc = value;
@@ -353,11 +353,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad codsolot.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getCodsolot() {
         return codsolot;
@@ -365,11 +365,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad codsolot.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setCodsolot(String value) {
         this.codsolot = value;
@@ -377,11 +377,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad direccion.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getDireccion() {
         return direccion;
@@ -389,11 +389,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad direccion.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setDireccion(String value) {
         this.direccion = value;
@@ -401,11 +401,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad plano.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getPlano() {
         return plano;
@@ -413,11 +413,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad plano.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setPlano(String value) {
         this.plano = value;
@@ -425,11 +425,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad ubigeo.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getUbigeo() {
         return ubigeo;
@@ -437,11 +437,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad ubigeo.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setUbigeo(String value) {
         this.ubigeo = value;
@@ -449,11 +449,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad departamento.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getDepartamento() {
         return departamento;
@@ -461,11 +461,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad departamento.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setDepartamento(String value) {
         this.departamento = value;
@@ -473,11 +473,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad provincia.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getProvincia() {
         return provincia;
@@ -485,11 +485,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad provincia.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setProvincia(String value) {
         this.provincia = value;
@@ -497,11 +497,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad distrito.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getDistrito() {
         return distrito;
@@ -509,11 +509,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad distrito.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setDistrito(String value) {
         this.distrito = value;
@@ -521,11 +521,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad internet.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getInternet() {
         return internet;
@@ -533,11 +533,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad internet.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setInternet(String value) {
         this.internet = value;
@@ -545,11 +545,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad telefonia.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getTelefonia() {
         return telefonia;
@@ -557,11 +557,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad telefonia.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setTelefonia(String value) {
         this.telefonia = value;
@@ -569,11 +569,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad cable.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getCable() {
         return cable;
@@ -581,11 +581,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad cable.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setCable(String value) {
         this.cable = value;
@@ -593,11 +593,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad faspid.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getFaspid() {
         return faspid;
@@ -605,11 +605,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad faspid.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setFaspid(String value) {
         this.faspid = value;
@@ -617,11 +617,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad faspmessage.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getFaspmessage() {
         return faspmessage;
@@ -629,11 +629,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad faspmessage.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setFaspmessage(String value) {
         this.faspmessage = value;
@@ -641,11 +641,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad seraffected.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getSeraffected() {
         return seraffected;
@@ -653,11 +653,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad seraffected.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setSeraffected(String value) {
         this.seraffected = value;
@@ -665,11 +665,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad listaServicioSucursal.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link ListaServicioSucursalType }
-     *
+     *     
      */
     public ListaServicioSucursalType getListaServicioSucursal() {
         return listaServicioSucursal;
@@ -677,11 +677,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad listaServicioSucursal.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link ListaServicioSucursalType }
-     *
+     *     
      */
     public void setListaServicioSucursal(ListaServicioSucursalType value) {
         this.listaServicioSucursal = value;
@@ -689,11 +689,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad flgPortable.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getFlgPortable() {
         return flgPortable;
@@ -701,11 +701,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad flgPortable.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setFlgPortable(String value) {
         this.flgPortable = value;
@@ -713,11 +713,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad numSlc.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getNumSlc() {
         return numSlc;
@@ -725,11 +725,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad numSlc.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setNumSlc(String value) {
         this.numSlc = value;
@@ -737,11 +737,11 @@ public class SucursalType {
 
     /**
      * Obtiene el valor de la propiedad plataforma.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getPlataforma() {
         return plataforma;
@@ -749,11 +749,11 @@ public class SucursalType {
 
     /**
      * Define el valor de la propiedad plataforma.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setPlataforma(String value) {
         this.plataforma = value;

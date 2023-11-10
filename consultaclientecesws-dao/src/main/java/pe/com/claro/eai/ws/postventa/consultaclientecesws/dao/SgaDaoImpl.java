@@ -1,5 +1,6 @@
 package pe.com.claro.eai.ws.postventa.consultaclientecesws.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,21 +13,16 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
 import oracle.jdbc.driver.OracleTypes;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Cliente;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ClientePorNombre;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClienteRequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClienteResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalDTHRequest;
@@ -53,6 +49,7 @@ import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicio
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioSucursalResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGARequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGAResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosCliente;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosIncidencia;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosSot;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DetalleSucursal;
@@ -63,6 +60,7 @@ import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Falla;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Janus;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaCliente;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaClientePorNombre;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaDatosCliente;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaDatosIncidencia;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaDatosSot;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaFalla;
@@ -70,6 +68,7 @@ import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaJanus;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaRegla;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaSeaChange;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaServicio;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ObtenerDatosClienteResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosRequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.RegistrarAuditoriaRequest;
@@ -79,8 +78,18 @@ import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.SeaChange;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Servicio;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ServicioSucursal;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.TecnologiaSGA;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.util.Utilitario;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Cliente;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ClientePorNombre;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.DBException;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarNumeroTelefonoRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarNumeroTelefonoResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ListaNumeroTelefono;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.NumeroTelefono;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Constantes;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.JAXBUtilitarios;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.PropertiesInternos;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Propiedades;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Utilitarios;
@@ -102,15 +111,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarClienteResponse consultarCliente(String mensajeTransaccion,
 			ConsultarClienteRequest objConsultarClienteRequest) throws DBException {
 		String metodo = "consultarCliente";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarClienteResponse response = new ConsultarClienteResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwner)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -161,13 +171,13 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_customer));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_TIPOBUSQUEDA] = " + objConsultarClienteRequest.getTipoBusqueda());
-			logger.info(String.valueOf(mensajeLog) + "[PI_VALOR_BUSQUEDA] = " + objConsultarClienteRequest.getValorBusqueda());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_TIPOBUSQUEDA] = " + objConsultarClienteRequest.getTipoBusqueda());
+			logger.info(mensajeLog + "[PI_VALOR_BUSQUEDA] = " + objConsultarClienteRequest.getValorBusqueda());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("PI_TIPOBUSQUEDA", objConsultarClienteRequest.getTipoBusqueda())
@@ -176,28 +186,27 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
 
 			ListaCliente listaCliente = new ListaCliente();
 			response.setCodRespuesta(resultMap.get("PO_CODIGO_SALIDA") != null
 					? resultMap.get("PO_CODIGO_SALIDA").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaCliente.setListCliente((List<Cliente>) resultMap.get("PO_CURSOR_CLIENTE"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad PO_CURSOR_CLIENTE] = "
+			logger.info(mensajeLog + "[Cantidad PO_CURSOR_CLIENTE] = "
 					+ (listaCliente.getListCliente() != null ? listaCliente.getListCliente().size() : 0));
 
 			String mensaje;
 			if (listaCliente.getListCliente() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
 				if (!listaCliente.getListCliente().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListCliente(listaCliente);
 					mensaje = resultMap.get("PO_MENSAJE_SALIDA") != null ? resultMap.get("PO_MENSAJE_SALIDA").toString()
 							: PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -205,8 +214,10 @@ public class SgaDaoImpl implements SgaDao {
 						: PropertiesInternos.STRING_EMPTY;
 			}
 			response.setMsgRespuesta(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError;
 			String msjError;
@@ -220,25 +231,34 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_customer).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public ConsultarDetalleSucursalResponse consultarDetalleSucursal(String mensajeTransaccion,
 			ConsultarDetalleSucursalRequest objConsultarDetalleSucursalRequest) throws DBException {
 		String metodo = "consultarDetalleSucursal";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarDetalleSucursalResponse objResponse = new ConsultarDetalleSucursalResponse();
 		List<DetalleSucursal> listaDetalleSucursal = new ArrayList<>();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
 			String outCursor = "PO_CURSOR_SUCURSALES";
 			
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_SGA + "]");
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = [" + this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS)
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(propiedadesExterna.dbSGADBOwner)
@@ -272,13 +292,15 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_Subsidiarydet_All));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objConsultarDetalleSucursalRequest.toString());
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_Subsidiarydet_All));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + objConsultarDetalleSucursalRequest.toString());
 
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			
-			SqlParameterSource paramatersIn = new BeanPropertySqlParameterSource(objConsultarDetalleSucursalRequest);
+//			SqlParameterSource paramatersIn = new BeanPropertySqlParameterSource(objConsultarDetalleSucursalRequest);
+			SqlParameterSource paramatersIn = new MapSqlParameterSource()
+					.addValue("PI_CUSTOMER_ID", objConsultarDetalleSucursalRequest.getPi_customer_id() );
 			
 			Map<String, Object> resultMap = jdbcCall.execute(paramatersIn);
 
@@ -288,10 +310,12 @@ public class SgaDaoImpl implements SgaDao {
 			objResponse.setPo_mensaje_salida(Utilitarios.isNullOrBlankToString(resultMap.get("PO_MENSAJE_SALIDA")));
 			objResponse.setListaDetalleSucursal(listaDetalleSucursal);
 			
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objResponse.toString());
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + objResponse.toString());
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(objResponse));
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -305,25 +329,32 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_Subsidiarydet_All).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 		return objResponse;
 	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public ConsultarEstadoServiciosResponse consultarEstadoServicios(String mensajeTransaccion,
 			ConsultarEstadoServiciosRequest objConsultarEstadoServiciosRequest) throws DBException {
 		String metodo = "consultarEstadoServicios";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarEstadoServiciosResponse objResponse = new ConsultarEstadoServiciosResponse();
 		List<EstadoServicio> listaEstadoServicio = new ArrayList<>();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
 			String outCursor = "PO_CURSOR";
 			
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + propiedadesExterna.dbSGADB + ", con JNDI = [" + propiedadesExterna.cJNDI_SGA + "]");
+			logger.info(mensajeLog + "Consultando BD " + propiedadesExterna.dbSGADB + ", con JNDI = [" + propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS)
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(propiedadesExterna.dbSGADBOwner)
@@ -346,9 +377,9 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.spSicess_FailbyLocation));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objConsultarEstadoServiciosRequest.toString());
+			logger.info(mensajeLog + "Se invocara el SP : " + propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.spSicess_FailbyLocation));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + objConsultarEstadoServiciosRequest.toString());
 
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			
@@ -362,10 +393,12 @@ public class SgaDaoImpl implements SgaDao {
 			objResponse.setPo_message_result(Utilitarios.isNullOrBlankToString(resultMap.get("PO_MESSAGE_RESULT")));
 			objResponse.setListaEstadoServicio(listaEstadoServicio);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objResponse.toString());
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + objResponse.toString());
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(objResponse));
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -379,6 +412,12 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_FailbyLocation).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 		return objResponse;
 	}
@@ -388,17 +427,17 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarDetalleSucursalDTHResponse consultarDetalleSucursalDTH(String mensajeTransaccion,
 			ConsultarDetalleSucursalDTHRequest objConsultarDetalleSucursalDthRequest) throws DBException {
 		String metodo = "consultarDetalleSucursalDTH";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarDetalleSucursalDTHResponse objResponse = new ConsultarDetalleSucursalDTHResponse();
 		List<DetalleSucursalDTH> listaDetalleSucursalDTH = new ArrayList<>();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
 			String outCursor = "PO_CURSOR_SUCURSALES";
 			
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + propiedadesExterna.dbSGADB + ", con JNDI = [" + propiedadesExterna.cJNDI_SGA + "]");
+			logger.info(mensajeLog + "Consultando BD " + propiedadesExterna.dbSGADB + ", con JNDI = [" + propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS)
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(propiedadesExterna.dbSGADBOwner)
@@ -429,9 +468,9 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.spSicess_Subsidiarydet_DTH));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objConsultarDetalleSucursalDthRequest.toString());
+			logger.info(mensajeLog + "Se invocara el SP : " + propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.spSicess_Subsidiarydet_DTH));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + objConsultarDetalleSucursalDthRequest.toString());
 
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			
@@ -445,10 +484,12 @@ public class SgaDaoImpl implements SgaDao {
 			objResponse.setPo_mensaje_salida(Utilitarios.isNullOrBlankToString(resultMap.get("PO_MENSAJE_SALIDA")));
 			objResponse.setListaDetalleSucursalDTH(listaDetalleSucursalDTH);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objResponse.toString());
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + objResponse.toString());
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(objResponse));
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -462,23 +503,31 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_Subsidiarydet_DTH).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
 		return objResponse;
 	}
+
 	@Override
 	public ConsultarJanusResponse consultarJanus(String mensajeTransaccion,
 			ConsultarJanusRequest objConsultarJanusRequest) throws DBException {
 		String metodo = "consultarJanus";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarJanusResponse response = new ConsultarJanusResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(this.propiedadesExterna.dbSGADBOwnerOperacion)
@@ -514,14 +563,14 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwnerOperacion.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_Janus));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[pi_v_sucursal] = " + objConsultarJanusRequest.getSucursal());
-			logger.info(String.valueOf(mensajeLog) + "[pi_gepacode] = " + propiedadesExterna.janusGepaCode);
-			logger.info(String.valueOf(mensajeLog) + "[pi_gepavalue] = " + propiedadesExterna.janusGepaValue);
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[pi_v_sucursal] = " + objConsultarJanusRequest.getSucursal());
+			logger.info(mensajeLog + "[pi_gepacode] = " + propiedadesExterna.janusGepaCode);
+			logger.info(mensajeLog + "[pi_gepavalue] = " + propiedadesExterna.janusGepaValue);
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("pi_v_sucursal", objConsultarJanusRequest.getSucursal())
@@ -531,28 +580,27 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[po_code_result] = " + resultMap.get("po_code_result"));
-			logger.info(String.valueOf(mensajeLog) + "[po_message_result] = " + resultMap.get("po_message_result"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[po_code_result] = " + resultMap.get("po_code_result"));
+			logger.info(mensajeLog + "[po_message_result] = " + resultMap.get("po_message_result"));
 
 			ListaJanus listaJanus = new ListaJanus();
 			response.setCodRespuesta(resultMap.get("po_code_result") != null
 					? resultMap.get("po_code_result").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaJanus.setListJanus((List<Janus>) resultMap.get("po_cursor"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad po_cursor] = "
+			logger.info(mensajeLog + "[Cantidad po_cursor] = "
 					+ (listaJanus.getListJanus() != null ? listaJanus.getListJanus().size() : 0));
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			if (listaJanus.getListJanus() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
 				if (!listaJanus.getListJanus().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListJanus(listaJanus);
 					mensaje = resultMap.get("po_message_result") != null ? resultMap.get("po_message_result").toString()
 							: PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -560,8 +608,10 @@ public class SgaDaoImpl implements SgaDao {
 						: PropertiesInternos.STRING_EMPTY;
 			}
 			response.setMsgRespuesta(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -575,9 +625,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_Janus).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -585,15 +641,16 @@ public class SgaDaoImpl implements SgaDao {
 	public RegistrarAuditoriaResponse registrarAuditoria(String mensajeTransaccion,
 			RegistrarAuditoriaRequest objRegistrarAuditoriaRequest) throws DBException {
 		String metodo = "registrarAuditoria";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		RegistrarAuditoriaResponse response = new RegistrarAuditoriaResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwner)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -604,14 +661,14 @@ public class SgaDaoImpl implements SgaDao {
 							new SqlOutParameter("po_output_code", OracleTypes.INTEGER),
 							new SqlOutParameter("po_output_message", OracleTypes.VARCHAR));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_Auditoria));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[pi_userapplication] = " + objRegistrarAuditoriaRequest.getUserApplication());
-			logger.info(String.valueOf(mensajeLog) + "[pi_usersession] = " + objRegistrarAuditoriaRequest.getUserSession());
-			logger.info(String.valueOf(mensajeLog) + "[pi_idesbtransaction] = " + objRegistrarAuditoriaRequest.getIdESBTransaction());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[pi_userapplication] = " + objRegistrarAuditoriaRequest.getUserApplication());
+			logger.info(mensajeLog + "[pi_usersession] = " + objRegistrarAuditoriaRequest.getUserSession());
+			logger.info(mensajeLog + "[pi_idesbtransaction] = " + objRegistrarAuditoriaRequest.getIdESBTransaction());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("pi_userapplication", objRegistrarAuditoriaRequest.getUserApplication())
@@ -621,16 +678,20 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[po_output_code] = " + resultMap.get("po_output_code"));
-			logger.info(String.valueOf(mensajeLog) + "[po_output_message] = " + resultMap.get("po_output_message"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[po_output_code] = " + resultMap.get("po_output_code"));
+			logger.info(mensajeLog + "[po_output_message] = " + resultMap.get("po_output_message"));
 
 			response.setCodRespuesta(resultMap.get("po_output_code") != null
 					? resultMap.get("po_output_code").toString() : PropertiesInternos.STRING_EMPTY);
 			response.setMsgRespuesta(resultMap.get("po_output_message") != null
 					? resultMap.get("po_output_message").toString() : PropertiesInternos.STRING_EMPTY);
+			
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
+			
 		} catch (Exception e) {
-			logger.error(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -644,9 +705,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_Auditoria).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -654,15 +721,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarServicioResponse consultarServicio(String mensajeTransaccion,
 			ConsultarServicioRequest objConsultarServicioRequest) throws DBException {
 		String metodo = "consultarServicio";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarServicioResponse response = new ConsultarServicioResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwner)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -687,12 +755,12 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_customer));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_COD_SUCURSAL] = " + objConsultarServicioRequest.getCod_sucursal());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_COD_SUCURSAL] = " + objConsultarServicioRequest.getCod_sucursal());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("PI_COD_SUCURSAL",
 					objConsultarServicioRequest.getCod_sucursal());
@@ -700,28 +768,27 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
 
 			ListaServicio listaServicio = new ListaServicio();
 			response.setCodRespuesta(resultMap.get("PO_CODIGO_SALIDA") != null
 					? resultMap.get("PO_CODIGO_SALIDA").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaServicio.setListServicio((List<Servicio>) resultMap.get("PO_CURSOR_SERVICIO"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad PO_CURSOR_SERVICIO] = "
+			logger.info(mensajeLog + "[Cantidad PO_CURSOR_SERVICIO] = "
 					+ (listaServicio.getListServicio() != null ? listaServicio.getListServicio().size() : 0));
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			if (listaServicio.getListServicio() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
 				if (!listaServicio.getListServicio().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListServicio(listaServicio);
 					mensaje = resultMap.get("PO_MENSAJE_SALIDA") != null ? resultMap.get("PO_MENSAJE_SALIDA").toString()
 							: PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -729,6 +796,8 @@ public class SgaDaoImpl implements SgaDao {
 						: PropertiesInternos.STRING_EMPTY;
 			}
 			response.setMsgRespuesta(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -744,9 +813,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_servicesga).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -754,15 +829,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarSeaChangeResponse consultarSeaChange(String mensajeTransaccion,
 			ConsultarSeaChangeRequest objConsultarSeaChangeRequest) throws DBException {
 		String metodo = "consultarSeaChange";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarSeaChangeResponse response = new ConsultarSeaChangeResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwner)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -790,13 +866,13 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_seaChange));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[pi_client_id] = " + objConsultarSeaChangeRequest.getClientId());
-			logger.info(String.valueOf(mensajeLog) + "[pi_platform] = " + objConsultarSeaChangeRequest.getPlatform());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[pi_client_id] = " + objConsultarSeaChangeRequest.getClientId());
+			logger.info(mensajeLog + "[pi_platform] = " + objConsultarSeaChangeRequest.getPlatform());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("pi_client_id", objConsultarSeaChangeRequest.getClientId())
@@ -805,28 +881,27 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[po_output_code] = " + resultMap.get("po_output_code"));
-			logger.info(String.valueOf(mensajeLog) + "[po_output_message] = " + resultMap.get("po_output_message"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[po_output_code] = " + resultMap.get("po_output_code"));
+			logger.info(mensajeLog + "[po_output_message] = " + resultMap.get("po_output_message"));
 
 			ListaSeaChange listaSeaChange = new ListaSeaChange();
 			response.setCodRespuesta(resultMap.get("po_output_code") != null
 					? resultMap.get("po_output_code").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaSeaChange.setListSeaChange((List<SeaChange>) resultMap.get("po_output_cursor"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad po_output_cursor] = "
+			logger.info(mensajeLog + "[Cantidad po_output_cursor] = "
 					+ (listaSeaChange.getListSeaChange() != null ? listaSeaChange.getListSeaChange().size() : 0));
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			if (listaSeaChange.getListSeaChange() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
 				if (!listaSeaChange.getListSeaChange().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListSeaChange(listaSeaChange);
 					mensaje = resultMap.get("po_output_message") != null ? resultMap.get("po_output_message").toString()
 							: PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -834,6 +909,8 @@ public class SgaDaoImpl implements SgaDao {
 						: PropertiesInternos.STRING_EMPTY;
 			}
 			response.setMsgRespuesta(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -849,9 +926,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_seaChange).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -860,14 +943,15 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarInteraccionCasosResponse consultarSot(String mensajeTransaccion,
 			ConsultarInteraccionCasosRequest objConsultarInteraccionCasosRequest) throws DBException {
 		String metodo = "consultarSot";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarInteraccionCasosResponse response = new ConsultarInteraccionCasosResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["	+ this.propiedadesExterna.cJNDI_SGA + "]");
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["	+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS)
 					.withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
@@ -902,14 +986,14 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_Solot_Cliente));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_TECNOLOGIA] = " + objConsultarInteraccionCasosRequest.getTecnologia());
-			logger.info(String.valueOf(mensajeLog) + "[PI_CUSTOMER_ID] = " + objConsultarInteraccionCasosRequest.getCustomerId());
-			logger.info(String.valueOf(mensajeLog) + "[PI_CODSUC] = " + objConsultarInteraccionCasosRequest.getCodSucursal());
-			logger.info(String.valueOf(mensajeLog) + "[PI_SERVICE] = " + objConsultarInteraccionCasosRequest.getTelefono());
-			logger.info(String.valueOf(mensajeLog) + "[PI_CODCLI] = " + objConsultarInteraccionCasosRequest.getCodCliente());
-			logger.info(String.valueOf(mensajeLog) + "[PI_PLATAFORMA] = " + objConsultarInteraccionCasosRequest.getTipoPlataforma());
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_Solot_Cliente));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_TECNOLOGIA] = " + objConsultarInteraccionCasosRequest.getTecnologia());
+			logger.info(mensajeLog + "[PI_CUSTOMER_ID] = " + objConsultarInteraccionCasosRequest.getCustomerId());
+			logger.info(mensajeLog + "[PI_CODSUC] = " + objConsultarInteraccionCasosRequest.getCodSucursal());
+			logger.info(mensajeLog + "[PI_SERVICE] = " + objConsultarInteraccionCasosRequest.getTelefono());
+			logger.info(mensajeLog + "[PI_CODCLI] = " + objConsultarInteraccionCasosRequest.getCodCliente());
+			logger.info(mensajeLog + "[PI_PLATAFORMA] = " + objConsultarInteraccionCasosRequest.getTipoPlataforma());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("PI_TECNOLOGIA", objConsultarInteraccionCasosRequest.getTecnologia())
@@ -922,30 +1006,31 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
 
 			ListaDatosSot listaDatosSot = new ListaDatosSot();
 			response.setCodRespuesta(resultMap.get("PO_CODIGO_SALIDA").toString());
 			
 			listaDatosSot.setListDatosSot((List<DatosSot>) Optional.ofNullable(resultMap.get("PO_CURSOR_SOTS")).orElse(Collections.emptyList()));
 			
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad PO_CURSOR_SOTS] = " + listaDatosSot.getListDatosSot().size());
+			logger.info(mensajeLog + "[Cantidad PO_CURSOR_SOTS] = " + listaDatosSot.getListDatosSot().size());
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			
 			if (!listaDatosSot.getListDatosSot().isEmpty()) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+				logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 				response.setListDatosSot(listaDatosSot);
 				mensaje = resultMap.get("PO_MENSAJE_SALIDA").toString();
 			} else {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+				logger.info(mensajeLog + Constantes.LISTA_VACIA);
 				mensaje = Constantes.CURSOR_VACIO;
 			}
 			
 			response.setMsgRespuesta(mensaje);
-
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -961,9 +1046,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_Solot_Cliente).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -972,15 +1063,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarInteraccionCasosResponse consultarIncidencia(String mensajeTransaccion,
 			ConsultarInteraccionCasosRequest objConsultarInteraccionCasosRequest) throws DBException {
 		String metodo = "consultarIncidencia";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarInteraccionCasosResponse response = new ConsultarInteraccionCasosResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS)
 					.withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
@@ -1015,10 +1107,10 @@ public class SgaDaoImpl implements SgaDao {
 							new SqlOutParameter("PO_CODERROR", OracleTypes.INTEGER),
 							new SqlOutParameter("PO_DESCERROR", OracleTypes.VARCHAR));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + this.propiedadesExterna.dbSGADBOwnerAtccorp.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgRegistroReclamo).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_Incidencia));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_CODCLI] = " + objConsultarInteraccionCasosRequest.getCodCliente());
-			logger.info(String.valueOf(mensajeLog) + "[PI_SERVICE] = " + objConsultarInteraccionCasosRequest.getTelefono());
+			logger.info(mensajeLog + "Se invocara el SP : " + this.propiedadesExterna.dbSGADBOwnerAtccorp.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.pkgRegistroReclamo).concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicess_Incidencia));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_CODCLI] = " + objConsultarInteraccionCasosRequest.getCodCliente());
+			logger.info(mensajeLog + "[PI_SERVICE] = " + objConsultarInteraccionCasosRequest.getTelefono());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("PI_CODCLI", objConsultarInteraccionCasosRequest.getCodCliente())
@@ -1027,9 +1119,9 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODERROR] = " + resultMap.get("PO_CODERROR"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_DESCERROR] = " + resultMap.get("PO_DESCERROR"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODERROR] = " + resultMap.get("PO_CODERROR"));
+			logger.info(mensajeLog + "[PO_DESCERROR] = " + resultMap.get("PO_DESCERROR"));
 
 			ListaDatosIncidencia listaDatosIncidencia = new ListaDatosIncidencia();
 			
@@ -1037,20 +1129,21 @@ public class SgaDaoImpl implements SgaDao {
 			
 			listaDatosIncidencia.setListDatosIncidencia((List<DatosIncidencia>) Optional.ofNullable(resultMap.get("PO_CURSOR")).orElse(Collections.emptyList()));
 							
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad PO_CURSOR] = " + listaDatosIncidencia.getListDatosIncidencia().size());
+			logger.info(mensajeLog + "[Cantidad PO_CURSOR] = " + listaDatosIncidencia.getListDatosIncidencia().size());
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			
 			if (!listaDatosIncidencia.getListDatosIncidencia().isEmpty()) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+				logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 				response.setListDatosIncidencia(listaDatosIncidencia);
 				mensaje = resultMap.get("PO_DESCERROR").toString();
 			} else {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+				logger.info(mensajeLog + Constantes.LISTA_VACIA);
 				mensaje = Constantes.CURSOR_VACIO;
 			}
 			response.setMsgRespuesta(mensaje);
-
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -1064,9 +1157,15 @@ public class SgaDaoImpl implements SgaDao {
 				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB).replace("$sp", propiedadesExterna.spSicess_Incidencia).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1074,15 +1173,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarFallaResponse consultarFalla(String mensajeTransaccion,
 			ConsultarFallaRequest objConsultarFallaRequest) throws DBException {
 		String metodo = "consultarFalla";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarFallaResponse response = new ConsultarFallaResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwner)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -1110,13 +1210,13 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_Falla));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[pi_v_plan] = " + objConsultarFallaRequest.getPlano());
-			logger.info(String.valueOf(mensajeLog) + "[pi_v_fail] = " + objConsultarFallaRequest.getTipo());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[pi_v_plan] = " + objConsultarFallaRequest.getPlano());
+			logger.info(mensajeLog + "[pi_v_fail] = " + objConsultarFallaRequest.getTipo());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("pi_v_plan", objConsultarFallaRequest.getPlano())
@@ -1125,28 +1225,27 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[po_code_result] = " + resultMap.get("po_code_result"));
-			logger.info(String.valueOf(mensajeLog) + "[po_message_result] = " + resultMap.get("po_message_result"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[po_code_result] = " + resultMap.get("po_code_result"));
+			logger.info(mensajeLog + "[po_message_result] = " + resultMap.get("po_message_result"));
 
 			ListaFalla listaFalla = new ListaFalla();
 			response.setCodRespuesta(resultMap.get("po_code_result") != null
 					? resultMap.get("po_code_result").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaFalla.setListFalla((List<Falla>) resultMap.get("po_cursor"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad po_cursor] = "
+			logger.info(mensajeLog + "[Cantidad po_cursor] = "
 					+ (listaFalla.getListFalla() != null ? listaFalla.getListFalla().size() : 0));
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			if (listaFalla.getListFalla() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
 				if (!listaFalla.getListFalla().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListFalla(listaFalla);
 					mensaje = resultMap.get("po_message_result") != null ? resultMap.get("po_message_result").toString()
 							: PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -1154,6 +1253,8 @@ public class SgaDaoImpl implements SgaDao {
 						: PropertiesInternos.STRING_EMPTY;
 			}
 			response.setMsgRespuesta(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -1169,9 +1270,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_Falla).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1179,15 +1286,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarEquipoResponse consultarEquipoInternet(String mensajeTransaccion,
 			ConsultarEquipoRequest objConsultarEquipoRequest) throws DBException {
 		String metodo = "consultarEquipoInternet";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarEquipoResponse response = new ConsultarEquipoResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwnerIntraway)
 					.withProcedureName(this.propiedadesExterna.pkgEquipo.concat(PropertiesInternos.PUNTO)
@@ -1229,12 +1337,12 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwnerIntraway.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_EquipoInternet));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[l_cliente] = " + objConsultarEquipoRequest.getCustomerId());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[l_cliente] = " + objConsultarEquipoRequest.getCustomerId());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("l_cliente",
 					objConsultarEquipoRequest.getCustomerId());
@@ -1242,9 +1350,9 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[l_iderr] = " + resultMap.get("l_iderr"));
-			logger.info(String.valueOf(mensajeLog) + "[l_mens] = " + resultMap.get("l_mens"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[l_iderr] = " + resultMap.get("l_iderr"));
+			logger.info(mensajeLog + "[l_mens] = " + resultMap.get("l_mens"));
 
 			response.setCodRespuesta(resultMap.get("l_iderr") != null ? resultMap.get("l_iderr").toString()
 					: PropertiesInternos.STRING_EMPTY);
@@ -1255,8 +1363,10 @@ public class SgaDaoImpl implements SgaDao {
 				@SuppressWarnings("unchecked")
 				List<Equipo> listaEquipo = (List<Equipo>) resultMap.get("o_mensaje");
 				response.setListEquipo(listaEquipo);
-				logger.info(String.valueOf(mensajeLog) + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
+				logger.info(mensajeLog + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
 			}
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -1272,9 +1382,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_EquipoInternet).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1282,15 +1398,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarEquipoResponse consultarEquipoTelefonia(String mensajeTransaccion,
 			ConsultarEquipoRequest objConsultarEquipoRequest) throws DBException {
 		String metodo = "consultarEquipoTelefonia";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarEquipoResponse response = new ConsultarEquipoResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwnerIntraway)
 					.withProcedureName(this.propiedadesExterna.pkgEquipo.concat(PropertiesInternos.PUNTO)
@@ -1330,12 +1447,12 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwnerIntraway.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_EquipoTelefonia));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[l_cliente] = " + objConsultarEquipoRequest.getCustomerId());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[l_cliente] = " + objConsultarEquipoRequest.getCustomerId());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("l_cliente",
 					objConsultarEquipoRequest.getCustomerId());
@@ -1343,9 +1460,9 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[l_iderr] = " + resultMap.get("l_iderr"));
-			logger.info(String.valueOf(mensajeLog) + "[l_mens] = " + resultMap.get("l_mens"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[l_iderr] = " + resultMap.get("l_iderr"));
+			logger.info(mensajeLog + "[l_mens] = " + resultMap.get("l_mens"));
 
 			response.setCodRespuesta(resultMap.get("l_iderr") != null ? resultMap.get("l_iderr").toString()
 					: PropertiesInternos.STRING_EMPTY);
@@ -1356,8 +1473,10 @@ public class SgaDaoImpl implements SgaDao {
 				@SuppressWarnings("unchecked")
 				List<Equipo> listaEquipo = (List<Equipo>) resultMap.get("o_mensaje");
 				response.setListEquipo(listaEquipo);
-				logger.info(String.valueOf(mensajeLog) + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
+				logger.info(mensajeLog + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
 			}
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -1373,9 +1492,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_EquipoTelefonia).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1383,15 +1508,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarEquipoResponse consultarEquipoCable(String mensajeTransaccion,
 			ConsultarEquipoRequest objConsultarEquipoRequest) throws DBException {
 		String metodo = "consultarEquipoCable";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarEquipoResponse response = new ConsultarEquipoResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwnerIntraway)
 					.withProcedureName(this.propiedadesExterna.pkgEquipo.concat(PropertiesInternos.PUNTO)
@@ -1435,12 +1561,12 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwnerIntraway.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_EquipoCable));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[l_cliente] = " + objConsultarEquipoRequest.getCustomerId());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[l_cliente] = " + objConsultarEquipoRequest.getCustomerId());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("l_cliente",
 					objConsultarEquipoRequest.getCustomerId());
@@ -1448,9 +1574,9 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[l_iderr] = " + resultMap.get("l_iderr"));
-			logger.info(String.valueOf(mensajeLog) + "[l_mens] = " + resultMap.get("l_mens"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[l_iderr] = " + resultMap.get("l_iderr"));
+			logger.info(mensajeLog + "[l_mens] = " + resultMap.get("l_mens"));
 
 			response.setCodRespuesta(resultMap.get("l_iderr") != null ? resultMap.get("l_iderr").toString()
 					: PropertiesInternos.STRING_EMPTY);
@@ -1461,8 +1587,10 @@ public class SgaDaoImpl implements SgaDao {
 				@SuppressWarnings("unchecked")
 				List<Equipo> listaEquipo = (List<Equipo>) resultMap.get("o_mensaje");
 				response.setListEquipo(listaEquipo);
-				logger.info(String.valueOf(mensajeLog) + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
+				logger.info(mensajeLog + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
 			}
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -1478,9 +1606,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_EquipoCable).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1488,15 +1622,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarEquipoResponse consultarEquipoComplemento(String mensajeTransaccion,
 			ConsultarEquipoRequest objConsultarEquipoRequest) throws DBException {
 		String metodo = "consultarEquipoComplemento";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarEquipoResponse response = new ConsultarEquipoResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwnerIntraway)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -1555,13 +1690,13 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwnerIntraway.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_EquipoInc));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[pi_desc_modelo] = " + objConsultarEquipoRequest.getModel());
-			logger.info(String.valueOf(mensajeLog) + "[pi_mac_serial] = " + objConsultarEquipoRequest.getMacSerial());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[pi_desc_modelo] = " + objConsultarEquipoRequest.getModel());
+			logger.info(mensajeLog + "[pi_mac_serial] = " + objConsultarEquipoRequest.getMacSerial());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("pi_desc_modelo", objConsultarEquipoRequest.getModel())
@@ -1570,9 +1705,9 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[po_codigo_salida] = " + resultMap.get("po_codigo_salida"));
-			logger.info(String.valueOf(mensajeLog) + "[po_mensaje_salida] = " + resultMap.get("po_mensaje_salida"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[po_codigo_salida] = " + resultMap.get("po_codigo_salida"));
+			logger.info(mensajeLog + "[po_mensaje_salida] = " + resultMap.get("po_mensaje_salida"));
 
 			response.setCodRespuesta(resultMap.get("po_codigo_salida") != null
 					? resultMap.get("po_codigo_salida").toString() : PropertiesInternos.STRING_EMPTY);
@@ -1586,8 +1721,10 @@ public class SgaDaoImpl implements SgaDao {
 				logger.info(
 						mensajeLog + "[Cantidad po_cursor_equipo] = " + (listaEquipo != null ? listaEquipo.size() : 0));
 			}
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
-			logger.info(String.valueOf(mensajeLog) + "Error en la ejecucion del SP : ", e);
+			logger.info(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
 			String codError = PropertiesInternos.STRING_EMPTY;
 			String msjError = PropertiesInternos.STRING_EMPTY;
@@ -1601,9 +1738,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_EquipoInc).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1613,15 +1756,16 @@ public class SgaDaoImpl implements SgaDao {
 			ConsultarReglaRequest objConsultarReglaRequest) throws DBException {
 
 		String metodo = "consultarRegla";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarReglaResponse response = new ConsultarReglaResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(this.propiedadesExterna.dbSGADBOwnerOperacion)
@@ -1646,17 +1790,17 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwnerOperacion.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_validateservice));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[pi_customerid] = " + objConsultarReglaRequest.getCustomerId());
-			logger.info(String.valueOf(mensajeLog) + "[pi_coid] = " + objConsultarReglaRequest.getCoId());
-			logger.info(String.valueOf(mensajeLog) + "[pi_codsolot] = " + objConsultarReglaRequest.getCodSolot());
-			logger.info(String.valueOf(mensajeLog) + "[pi_telefono] = " + objConsultarReglaRequest.getTelefono());
-			logger.info(String.valueOf(mensajeLog) + "[pi_ciclooac] = " + objConsultarReglaRequest.getCicloOAC());
-			logger.info(String.valueOf(mensajeLog) + "[pi_rulers] = " + objConsultarReglaRequest.getRulers());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[pi_customerid] = " + objConsultarReglaRequest.getCustomerId());
+			logger.info(mensajeLog + "[pi_coid] = " + objConsultarReglaRequest.getCoId());
+			logger.info(mensajeLog + "[pi_codsolot] = " + objConsultarReglaRequest.getCodSolot());
+			logger.info(mensajeLog + "[pi_telefono] = " + objConsultarReglaRequest.getTelefono());
+			logger.info(mensajeLog + "[pi_ciclooac] = " + objConsultarReglaRequest.getCicloOAC());
+			logger.info(mensajeLog + "[pi_rulers] = " + objConsultarReglaRequest.getRulers());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("pi_customerid", objConsultarReglaRequest.getCustomerId())
@@ -1669,28 +1813,27 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[po_code_result] = " + resultMap.get("po_code_result"));
-			logger.info(String.valueOf(mensajeLog) + "[po_message_result] = " + resultMap.get("po_message_result"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[po_code_result] = " + resultMap.get("po_code_result"));
+			logger.info(mensajeLog + "[po_message_result] = " + resultMap.get("po_message_result"));
 
 			ListaRegla listaRegla = new ListaRegla();
 			response.setCodRespuesta(resultMap.get("po_code_result") != null
 					? resultMap.get("po_code_result").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaRegla.setListRegla((List<Regla>) resultMap.get("po_cursor_rulers"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad po_cursor_rulers] = "
+			logger.info(mensajeLog + "[Cantidad po_cursor_rulers] = "
 					+ (listaRegla.getListRegla() != null ? listaRegla.getListRegla().size() : 0));
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			if (listaRegla.getListRegla() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
 				if (!listaRegla.getListRegla().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListRegla(listaRegla);
 					mensaje = resultMap.get("po_message_result") != null ? resultMap.get("po_message_result").toString()
 							: PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -1698,6 +1841,8 @@ public class SgaDaoImpl implements SgaDao {
 						: PropertiesInternos.STRING_EMPTY;
 			}
 			response.setMsgRespuesta(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -1713,9 +1858,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_validateservice).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1725,15 +1876,16 @@ public class SgaDaoImpl implements SgaDao {
 			ConsultarReglaRequest objConsultarReglaRequest) throws DBException {
 
 		String metodo = "consultarReglaComplemento";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarReglaResponse response = new ConsultarReglaResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwnerIntraway)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -1756,16 +1908,16 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwnerIntraway.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_validateservice));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[pi_customerid] = " + objConsultarReglaRequest.getCustomerId());
-			logger.info(String.valueOf(mensajeLog) + "[pi_codsolot] = " + objConsultarReglaRequest.getCodSolot());
-			logger.info(String.valueOf(mensajeLog) + "[pi_telefono] = " + objConsultarReglaRequest.getTelefono());
-			logger.info(String.valueOf(mensajeLog) + "[pi_coid] = " + objConsultarReglaRequest.getCoId());
-			logger.info(String.valueOf(mensajeLog) + "[pi_rulers] = " + objConsultarReglaRequest.getRulers());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[pi_customerid] = " + objConsultarReglaRequest.getCustomerId());
+			logger.info(mensajeLog + "[pi_codsolot] = " + objConsultarReglaRequest.getCodSolot());
+			logger.info(mensajeLog + "[pi_telefono] = " + objConsultarReglaRequest.getTelefono());
+			logger.info(mensajeLog + "[pi_coid] = " + objConsultarReglaRequest.getCoId());
+			logger.info(mensajeLog + "[pi_rulers] = " + objConsultarReglaRequest.getRulers());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
 					.addValue("pi_customerid", objConsultarReglaRequest.getCustomerId())
@@ -1777,28 +1929,27 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[po_code_result] = " + resultMap.get("po_code_result"));
-			logger.info(String.valueOf(mensajeLog) + "[po_message_result] = " + resultMap.get("po_message_result"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[po_code_result] = " + resultMap.get("po_code_result"));
+			logger.info(mensajeLog + "[po_message_result] = " + resultMap.get("po_message_result"));
 
 			ListaRegla listaRegla = new ListaRegla();
 			response.setCodRespuesta(resultMap.get("po_code_result") != null
 					? resultMap.get("po_code_result").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaRegla.setListRegla((List<Regla>) resultMap.get("po_cursor_rulers"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad po_cursor_rulers] = "
+			logger.info(mensajeLog + "[Cantidad po_cursor_rulers] = "
 					+ (listaRegla.getListRegla() != null ? listaRegla.getListRegla().size() : 0));
 
 			String mensaje = PropertiesInternos.STRING_EMPTY;
 			if (listaRegla.getListRegla() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
 				if (!listaRegla.getListRegla().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListRegla(listaRegla);
 					mensaje = resultMap.get("po_message_result") != null ? resultMap.get("po_message_result").toString()
 							: PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -1806,6 +1957,8 @@ public class SgaDaoImpl implements SgaDao {
 						: PropertiesInternos.STRING_EMPTY;
 			}
 			response.setMsgRespuesta(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -1821,9 +1974,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_validateservice).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1831,15 +1990,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ReconectarNcosResponse reconectarNcos(String mensajeTransaccion,
 			ReconectarNcosRequest objReconectarNcosRequest) throws DBException {
 		String metodo = "reconectarNcos";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ReconectarNcosResponse response = new ReconectarNcosResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwnerIntraway)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -1849,12 +2009,12 @@ public class SgaDaoImpl implements SgaDao {
 							new SqlOutParameter("PO_CODIGO_SALIDA", OracleTypes.VARCHAR),
 							new SqlOutParameter("PO_MENSAJE_SALIDA", OracleTypes.VARCHAR));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwnerIntraway.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_reconect_ncos_inc));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_CUSTOMERID] = " + objReconectarNcosRequest.getCustomerId());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_CUSTOMERID] = " + objReconectarNcosRequest.getCustomerId());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("PI_CUSTOMERID",
 					objReconectarNcosRequest.getCustomerId());
@@ -1862,10 +2022,10 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CALL_BARRING_TYPE] = " + resultMap.get("PO_CALL_BARRING_TYPE"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CALL_BARRING_TYPE] = " + resultMap.get("PO_CALL_BARRING_TYPE"));
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
 
 			response.setCallBarringType(resultMap.get("PO_CALL_BARRING_TYPE") != null
 					? resultMap.get("PO_CALL_BARRING_TYPE").toString() : PropertiesInternos.STRING_EMPTY);
@@ -1873,7 +2033,7 @@ public class SgaDaoImpl implements SgaDao {
 					? resultMap.get("PO_CODIGO_SALIDA").toString() : PropertiesInternos.STRING_EMPTY);
 			response.setMsgRespuesta(resultMap.get("PO_MENSAJE_SALIDA") != null
 					? resultMap.get("PO_MENSAJE_SALIDA").toString() : PropertiesInternos.STRING_EMPTY);
-
+			logger.info(mensajeLog + "[SALIDA] = " + JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -1889,9 +2049,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_validateservice).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1899,15 +2065,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarEquipoResponse consultarEquipoLte(String mensajeTransaccion,
 			ConsultarEquipoRequest objConsultarEquipoRequest) throws DBException {
 		String metodo = "consultarEquipoLteDth";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarEquipoResponse response = new ConsultarEquipoResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwner)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -1932,12 +2099,12 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicess_EquipoLte));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_CODSOLOT] = " + objConsultarEquipoRequest.getCodSolot());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_CODSOLOT] = " + objConsultarEquipoRequest.getCodSolot());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("PI_CODSOLOT",
 					objConsultarEquipoRequest.getCodSolot());
@@ -1945,9 +2112,9 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
 
 			response.setCodRespuesta(resultMap.get("PO_CODIGO_SALIDA") != null
 					? resultMap.get("PO_CODIGO_SALIDA").toString() : PropertiesInternos.STRING_EMPTY);
@@ -1958,8 +2125,10 @@ public class SgaDaoImpl implements SgaDao {
 				@SuppressWarnings("unchecked")
 				List<Equipo> listaEquipo = (List<Equipo>) resultMap.get("PO_CURSOR_EQUIPO");
 				response.setListEquipo(listaEquipo);
-				logger.info(String.valueOf(mensajeLog) + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
+				logger.info(mensajeLog + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
 			}
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -1975,9 +2144,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicess_EquipoLte).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -1985,15 +2160,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarEquipoResponse consultarEquipoComplementoLTEDTH(String mensajeTransaccion,
 			ConsultarEquipoRequest objConsultarEquipoRequest) throws DBException {
 		String metodo = "consultarEquipoComplementoLTEDTH";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarEquipoResponse response = new ConsultarEquipoResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwner)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -2012,12 +2188,12 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicessEquipmentDth));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_IMEI_ESN_UA] = " + objConsultarEquipoRequest.getUaNumber());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_IMEI_ESN_UA] = " + objConsultarEquipoRequest.getUaNumber());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("PI_IMEI_ESN_UA",
 					objConsultarEquipoRequest.getUaNumber());
@@ -2025,9 +2201,9 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
 
 			response.setCodRespuesta(resultMap.get("PO_CODIGO_SALIDA") != null
 					? resultMap.get("PO_CODIGO_SALIDA").toString() : PropertiesInternos.STRING_EMPTY);
@@ -2038,8 +2214,10 @@ public class SgaDaoImpl implements SgaDao {
 				@SuppressWarnings("unchecked")
 				List<Equipo> listaEquipo = (List<Equipo>) resultMap.get("PO_CURSOR_EQUIPO");
 				response.setListEquipo(listaEquipo);
-				logger.info(String.valueOf(mensajeLog) + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
+				logger.info(mensajeLog + "[Cantidad o_mensaje] = " + (listaEquipo != null ? listaEquipo.size() : 0));
 			}
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -2055,9 +2233,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicessEquipmentDth).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -2066,17 +2250,18 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarServicioSucursalResponse consultarServicioSucursal(String mensajeTransaccion,
 			ConsultarServicioSucursalRequest ConsultarServicioSucursalRequest) throws DBException {
 		String metodo = "consultarServicioSucursal";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarServicioSucursalResponse objResponse = new ConsultarServicioSucursalResponse();
 		List<ServicioSucursal> listaServicioSucursal = new ArrayList<>();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
+			
 			String outCursor = "PO_CURSOR_SERVICIO";
 			
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + propiedadesExterna.dbSGADB + ", con JNDI = [" + propiedadesExterna.cJNDI_SGA + "]");
+			logger.info(mensajeLog + "Consultando BD " + propiedadesExterna.dbSGADB + ", con JNDI = [" + propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS)
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(propiedadesExterna.dbSGADBOwner)
@@ -2099,9 +2284,9 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.spSicessServicePrinc));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + ConsultarServicioSucursalRequest.toString());
+			logger.info(mensajeLog + "Se invocara el SP : " + propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.spSicessServicePrinc));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + ConsultarServicioSucursalRequest.toString());
 
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			
@@ -2115,8 +2300,10 @@ public class SgaDaoImpl implements SgaDao {
 			objResponse.setPo_mensaje_salida(Utilitarios.isNullOrBlankToString(resultMap.get("PO_MENSAJE_SALIDA")));
 			objResponse.setListaServicioSucursal(listaServicioSucursal);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objResponse.toString());
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + objResponse.toString());
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(objResponse));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -2132,6 +2319,12 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicessEquipmentDth).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 		return objResponse;
 	}
@@ -2141,15 +2334,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarClienteResponse consultarClienteComplemento(String mensajeTransaccion,
 			ConsultarClienteRequest objConsultarClienteRequest) throws DBException {
 		String metodo = "consultarClienteComplemento";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarClienteResponse response = new ConsultarClienteResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(this.propiedadesExterna.dbSGADBOwner)
 					.withProcedureName(this.propiedadesExterna.pkgSicesFailure.concat(PropertiesInternos.PUNTO)
@@ -2167,12 +2361,12 @@ public class SgaDaoImpl implements SgaDao {
 							}), new SqlOutParameter("PO_CODIGO_SALIDA", OracleTypes.INTEGER),
 							new SqlOutParameter("PO_MENSAJE_SALIDA", OracleTypes.VARCHAR));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicessDatosCliente));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_DOCUMENTO] = " + objConsultarClienteRequest.getValorBusqueda());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_DOCUMENTO] = " + objConsultarClienteRequest.getValorBusqueda());
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("PI_DOCUMENTO",
 					objConsultarClienteRequest.getValorBusqueda());
@@ -2180,28 +2374,27 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
 
 			ListaCliente listaCliente = new ListaCliente();
 			response.setCodRespuesta(resultMap.get("PO_CODIGO_SALIDA") != null
 					? resultMap.get("PO_CODIGO_SALIDA").toString() : PropertiesInternos.STRING_EMPTY);
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaCliente.setListCliente((List<Cliente>) resultMap.get("PO_CURSOR"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad PO_CURSOR] = "
+			logger.info(mensajeLog + "[Cantidad PO_CURSOR] = "
 					+ (listaCliente.getListCliente() != null ? listaCliente.getListCliente().size() : 0));
 
 			String mensaje;
 			if (listaCliente.getListCliente() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
 				if (!listaCliente.getListCliente().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListCliente(listaCliente);
 					mensaje = resultMap.get("PO_MENSAJE_SALIDA") != null ? resultMap.get("PO_MENSAJE_SALIDA").toString()
 							: PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -2209,6 +2402,8 @@ public class SgaDaoImpl implements SgaDao {
 						: PropertiesInternos.STRING_EMPTY;
 			}
 			response.setMsgRespuesta(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -2224,9 +2419,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicessDatosCliente).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -2234,15 +2435,16 @@ public class SgaDaoImpl implements SgaDao {
 	public String obtenerNumeroDocumento(String mensajeTransaccion, String strCodCli) throws DBException {
 
 		String metodo = "obtenerNumeroDocumento";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		String strNumDoc = "";
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(sgaDS);
 			jdbcTemplate.setResultsMapCaseInsensitive(true);
 
@@ -2251,21 +2453,21 @@ public class SgaDaoImpl implements SgaDao {
 					.withCatalogName(this.propiedadesExterna.pkgSicesFailure)
 					.withFunctionName(this.propiedadesExterna.fnSiceFunDocumento);
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara a la Funcion : "
+			logger.info(mensajeLog + "Se invocara a la Funcion : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.fnSiceFunDocumento));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_CODCLI] = " + strCodCli);
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_CODCLI] = " + strCodCli);
 
 			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("pi_codcli", strCodCli);
 
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			strNumDoc = jdbcCall.executeFunction(String.class, objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[RESULT] = " + strNumDoc);
-
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[RESULT] = " + strNumDoc);
+			
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -2281,9 +2483,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.fnSiceFunDocumento).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return strNumDoc;
 	}
 
@@ -2291,15 +2499,16 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarClientePorNombreResponse consultarClientePorNombre(String mensajeTransaccion,
 			ConsultarClientePorNombreRequest objConsultarClientePorNombreRequest) throws DBException {
 		String metodo = "consultarClientePorNombre";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarClientePorNombreResponse response = new ConsultarClientePorNombreResponse();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
 					+ this.propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withSchemaName(this.propiedadesExterna.dbSGADBOwner)
 					.withCatalogName(this.propiedadesExterna.pkgSicesFailure)
 					.withProcedureName(this.propiedadesExterna.spSicessCustomerRsNom)
@@ -2321,12 +2530,12 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : "
+			logger.info(mensajeLog + "Se invocara el SP : "
 					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO)
 							.concat(this.propiedadesExterna.spSicessCustomerRsNom));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PI_TIPOBUSQUEDA] = " + objConsultarClientePorNombreRequest.getTipobusqueda());
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_TIPOBUSQUEDA] = " + objConsultarClientePorNombreRequest.getTipobusqueda());
 			logger.info(
 					mensajeLog + "[PI_VALOR_BUSQUEDA] = " + objConsultarClientePorNombreRequest.getValor_busqueda());
 
@@ -2337,9 +2546,9 @@ public class SgaDaoImpl implements SgaDao {
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
 			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
 
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
-			logger.info(String.valueOf(mensajeLog) + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
 
 			ListaClientePorNombre listaClientePorNombre = new ListaClientePorNombre();
 			response.setCodRespuesta(resultMap.get("PO_CODIGO_SALIDA") != null
@@ -2350,20 +2559,19 @@ public class SgaDaoImpl implements SgaDao {
 			if (response.getCodRespuesta().trim().equals(propiedadesExterna.IDF0CODIGO))
 				listaClientePorNombre
 						.setListClientePorNombre((List<ClientePorNombre>) resultMap.get("PO_CURSOR_CLIENTE"));
-			logger.info(String.valueOf(mensajeLog) + "[Cantidad PO_CURSOR_CLIENTE] = "
+			logger.info(mensajeLog + "[Cantidad PO_CURSOR_CLIENTE] = "
 					+ (listaClientePorNombre.getListClientePorNombre() != null
 							? listaClientePorNombre.getListClientePorNombre().size() : 0));
 
 			String mensaje;
 			if (listaClientePorNombre.getListClientePorNombre() != null) {
-				logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_NULA);
 				if (!listaClientePorNombre.getListClientePorNombre().isEmpty()) {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_NO_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
 					response.setListClientePorNombre(listaClientePorNombre);
 					mensaje = resultMap.get("PO_MENSAJE_SALIDA") != null ? resultMap.get("PO_MENSAJE_SALIDA").toString()
 							: PropertiesInternos.STRING_EMPTY;
 				} else {
-					logger.info(String.valueOf(mensajeLog) + Constantes.LISTA_VACIA);
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
 					mensaje = Constantes.CURSOR_VACIO;
 				}
 			} else {
@@ -2371,6 +2579,8 @@ public class SgaDaoImpl implements SgaDao {
 						: PropertiesInternos.STRING_EMPTY;
 			}
 			response.setMsgRespuesta(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -2386,9 +2596,15 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicessCustomerRsNom).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return response;
 	}
 
@@ -2397,17 +2613,18 @@ public class SgaDaoImpl implements SgaDao {
 	public ConsultarTecnologiaSGAResponse consultarTecnologia(String mensajeTransaccion,
 			ConsultarTecnologiaSGARequest objConsultarTecnologiaSGARequest) throws DBException {
 		String metodo = "consultarTecnologia";
-		String mensajeLog = String.valueOf(mensajeTransaccion) + "[" + metodo + "]-";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
 		ConsultarTecnologiaSGAResponse objResponse = new ConsultarTecnologiaSGAResponse();
 		List<TecnologiaSGA> listaTecnologiaSGA = new ArrayList<>();
-		logger.info(String.valueOf(mensajeLog) + " == Inicio del metodo " + metodo);
-
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
 		try {
+			
 			String outCursor = "PO_CURSOR_SUCURSALES";
 			
-			logger.info(String.valueOf(mensajeLog) + "Consultando BD " + propiedadesExterna.dbSGADB + ", con JNDI = [" + propiedadesExterna.cJNDI_SGA + "]");
+			logger.info(mensajeLog + "Consultando BD " + propiedadesExterna.dbSGADB + ", con JNDI = [" + propiedadesExterna.cJNDI_SGA + "]");
 			sgaDS.setLoginTimeout(propiedadesExterna.dbSgaDBLoginTimeout);
-
+			conexion = sgaDS.getConnection();
 			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS)
 					.withoutProcedureColumnMetaDataAccess()
 					.withSchemaName(propiedadesExterna.dbSGADBOwner)
@@ -2443,14 +2660,14 @@ public class SgaDaoImpl implements SgaDao {
 								}
 							}));
 
-			logger.info(String.valueOf(mensajeLog) + "Se invocara el SP : " + propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.spSicessTecnologia));
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [INPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objConsultarTecnologiaSGARequest.toString());
+			logger.info(mensajeLog + "Se invocara el SP : " + propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.pkgSicesFailure).concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.spSicessTecnologia));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + objConsultarTecnologiaSGARequest.toString());
 
 			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_BSCS);
 			
 			SqlParameterSource paramatersIn = new BeanPropertySqlParameterSource(objConsultarTecnologiaSGARequest);
-			
+		
 			Map<String, Object> resultMap = jdbcCall.execute(paramatersIn);
 
 			listaTecnologiaSGA = (List<TecnologiaSGA>) Optional.ofNullable(resultMap.get(outCursor)).orElse(Collections.emptyList());
@@ -2459,8 +2676,10 @@ public class SgaDaoImpl implements SgaDao {
 			objResponse.setPo_mensaje_salida(Utilitarios.isNullOrBlankToString(resultMap.get("PO_MENSAJE_SALIDA")));
 			objResponse.setListaTecnologiaSGA(listaTecnologiaSGA);
 			
-			logger.info(String.valueOf(mensajeLog) + "PARAMETROS [OUTPUT]: ");
-			logger.info(String.valueOf(mensajeLog) + objResponse.toString());
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + objResponse.toString());
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(objResponse));
 		} catch (Exception e) {
 			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
 			String error = e.toString();
@@ -2476,10 +2695,237 @@ public class SgaDaoImpl implements SgaDao {
 			}
 			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
 					.replace("$sp", propiedadesExterna.spSicessTecnologia).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
 		}
 
-		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
 		return objResponse;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public ConsultarNumeroTelefonoResponse consultarNumeroTelefono(String mensajeTransaccion, 
+			ConsultarNumeroTelefonoRequest objConsultarNumeroTelefonoRequest) throws DBException {
+		String metodo = "consultarNumeroTelefono";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
+		ConsultarNumeroTelefonoResponse response = new ConsultarNumeroTelefonoResponse();
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
+		try {
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+					+ this.propiedadesExterna.cJNDI_SGA + "]");
+			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
+			conexion = sgaDS.getConnection();
+			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
+					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwner)
+					.withCatalogName(propiedadesExterna.pkgSicesFailure)
+					.withProcedureName(this.propiedadesExterna.spSicessNumberPhone)
+					.declareParameters(new SqlParameter("PI_TIPOBUSQUEDA", OracleTypes.VARCHAR),
+							new SqlParameter("PI_VALOR_BUSQUEDA", OracleTypes.VARCHAR),
+							new SqlParameter("PI_VALOR_BUSQUEDA_DOC", OracleTypes.VARCHAR),
+							new SqlOutParameter("PO_CODIGO_SALIDA", OracleTypes.INTEGER),
+							new SqlOutParameter("PO_MENSAJE_SALIDA", OracleTypes.VARCHAR),
+							new SqlOutParameter("PO_CURSOR_NUMERO_TELEFONO", OracleTypes.CURSOR, new RowMapper<NumeroTelefono>() {
+								public NumeroTelefono mapRow(ResultSet rs, int arg1) throws SQLException {
+									NumeroTelefono numeroTelefono = new NumeroTelefono();
+									numeroTelefono.setCustomerId(rs.getString("CUSTOMER_ID") == null ? PropertiesInternos.STRING_EMPTY
+											: rs.getString("CUSTOMER_ID"));
+									numeroTelefono.setNumero(rs.getString("NUMERO") == null ? PropertiesInternos.STRING_EMPTY 
+											: rs.getString("NUMERO"));
+									return numeroTelefono;
+								}
+							}));
+
+			logger.info(mensajeLog + "Se invocara el SP : "
+					+ this.propiedadesExterna.dbSGADBOwner.concat(PropertiesInternos.PUNTO).concat(propiedadesExterna.pkgSicesFailure)
+					.concat(PropertiesInternos.PUNTO).concat(this.propiedadesExterna.spSicessNumberPhone));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[PI_TIPOBUSQUEDA] = " + objConsultarNumeroTelefonoRequest.getPiTipobusqueda());
+			logger.info(mensajeLog + "[PI_VALOR_BUSQUEDA] = " + objConsultarNumeroTelefonoRequest.getPiValorBusqueda());
+			logger.info(mensajeLog + "[PI_VALOR_BUSQUEDA_DOC] = " + objConsultarNumeroTelefonoRequest.getPiValorBusquedaDoc());
+
+			SqlParameterSource objParametrosIN = new MapSqlParameterSource()
+					.addValue("PI_TIPOBUSQUEDA", objConsultarNumeroTelefonoRequest.getPiTipobusqueda())
+					.addValue("PI_VALOR_BUSQUEDA", objConsultarNumeroTelefonoRequest.getPiValorBusqueda())
+					.addValue("PI_VALOR_BUSQUEDA_DOC", objConsultarNumeroTelefonoRequest.getPiValorBusquedaDoc());
+
+			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
+			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
+
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[PO_CODIGO_SALIDA] = " + resultMap.get("PO_CODIGO_SALIDA"));
+			logger.info(mensajeLog + "[PO_MENSAJE_SALIDA] = " + resultMap.get("PO_MENSAJE_SALIDA"));
+
+			ListaNumeroTelefono listaNumeroTelefono = new ListaNumeroTelefono();
+			response.setPoCodigoSalida(resultMap.get("PO_CODIGO_SALIDA") != null
+					? resultMap.get("PO_CODIGO_SALIDA").toString() : PropertiesInternos.STRING_EMPTY);
+			if (response.getPoCodigoSalida().trim().equals(propiedadesExterna.IDF0CODIGO))
+				listaNumeroTelefono.setListaNumeroTelefono((List<NumeroTelefono>) resultMap.get("PO_CURSOR_NUMERO_TELEFONO"));
+			logger.info(mensajeLog + "[Cantidad PO_CURSOR_NUMERO_TELEFONO] = "
+					+ (listaNumeroTelefono.getListaNumeroTelefono() != null ? listaNumeroTelefono.getListaNumeroTelefono().size() : 0));
+
+			String mensaje;
+			if (listaNumeroTelefono.getListaNumeroTelefono() != null) {
+				if (!listaNumeroTelefono.getListaNumeroTelefono().isEmpty()) {
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
+					response.setPoCursorNumeroTelefono(listaNumeroTelefono);;
+					mensaje = resultMap.get("PO_MENSAJE_SALIDA") != null ? resultMap.get("PO_MENSAJE_SALIDA").toString()
+							: PropertiesInternos.STRING_EMPTY;
+				} else {
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
+					mensaje = Constantes.CURSOR_VACIO;
+				}
+			} else {
+				mensaje = resultMap.get("PO_MENSAJE_SALIDA") != null ? resultMap.get("PO_MENSAJE_SALIDA").toString()
+						: PropertiesInternos.STRING_EMPTY;
+			}
+			response.setPoMensajeSalida(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
+		} catch (Exception e) {
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
+			String error = e.toString();
+			String codError;
+			String msjError;
+			if (error.toUpperCase(Locale.getDefault())
+					.contains(propiedadesExterna.dbErrorSqlTimeOutException.toUpperCase(Locale.getDefault()))) {
+				codError = propiedadesExterna.codConsultaClienteCESIdt1;
+				msjError = propiedadesExterna.msjConsultaClienteCESIdt1;
+			} else {
+				codError = propiedadesExterna.codConsultaClienteCESIdt2;
+				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
+			}
+			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
+					.replace("$sp", propiedadesExterna.spSicessNumberPhone).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
+		}
+
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
+		return response;
+	}
+	
+	@Override
+	public ObtenerDatosClienteResponse obtenerDatosCliente(String mensajeTransaccion,
+			 String i_codId) throws DBException {
+		// TODO Auto-generated method stub
+		String metodo = "obtenerTecnologia";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
+		ObtenerDatosClienteResponse response = new ObtenerDatosClienteResponse();
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
+		try {
+			
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+					+ this.propiedadesExterna.cJNDI_SGA + "]");
+			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
+			conexion = sgaDS.getConnection();
+			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
+					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwnerOperacion)
+					.withProcedureName(this.propiedadesExterna.pkgPostventaOne.concat(PropertiesInternos.PUNTO)
+							.concat(this.propiedadesExterna.spsgassListaDatosCLiente))
+					.declareParameters(new SqlParameter("P_COD_ID", OracleTypes.INTEGER),
+							new SqlOutParameter("P_ERROR", OracleTypes.INTEGER),
+							new SqlOutParameter("P_MENSAJE", OracleTypes.VARCHAR),
+							new SqlOutParameter("P_DAT_CLI", OracleTypes.CURSOR, new RowMapper<DatosCliente>() {
+								public DatosCliente mapRow(ResultSet rs, int arg1) throws SQLException {
+									DatosCliente datosCliente= new DatosCliente();
+									datosCliente.setC_contrato(rs.getString("CONTRATO") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("CONTRATO"));
+									datosCliente.setC_codcliente(rs.getString("CODCLIENTE") == null ? PropertiesInternos.STRING_EMPTY
+											: rs.getString("CODCLIENTE"));
+									datosCliente.setC_plano(rs.getString("PLANO") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("PLANO"));
+									datosCliente.setC_ubigeo(rs.getString("UBIGEO") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("UBIGEO"));
+									datosCliente.setC_estadoservicio(rs.getString("ESTADOSERVICIO") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("ESTADOSERVICIO"));
+									datosCliente.setC_cargoreconx(rs.getString("CARGORECONX") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("CARGORECONX"));
+									datosCliente.setC_tecnologia(rs.getString("TECNOLOGIA") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("TECNOLOGIA"));
+									return datosCliente;
+								}
+							}));
+
+			logger.info(mensajeLog + "Se invocara el SP : "
+					+ this.propiedadesExterna.dbSGADBOwnerOperacion.concat(PropertiesInternos.PUNTO)
+							.concat(this.propiedadesExterna.pkgPostventaOne).concat(PropertiesInternos.PUNTO)
+							.concat(this.propiedadesExterna.spsgassListaDatosCLiente));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[P_COD_ID] = " + i_codId);
+
+			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("P_COD_ID", i_codId);
+
+			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
+			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
+
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[P_ERROR] = " + resultMap.get("P_ERROR"));
+			logger.info(mensajeLog + "[P_MENSAJE] = " + resultMap.get("P_MENSAJE"));
+
+			ListaDatosCliente listaDatosCliente = new ListaDatosCliente();
+			response.setO_error(resultMap.get("P_ERROR") != null
+					? resultMap.get("P_ERROR").toString() : PropertiesInternos.STRING_EMPTY);
+			if (response.getO_error().trim().equals(propiedadesExterna.IDF0CODIGO))
+				listaDatosCliente.setListDatosCliente((List<DatosCliente>) resultMap.get("P_DAT_CLI")) ;
+			logger.info(mensajeLog + "[Cantidad PO_CURSOR_SERVICIO] = "
+					+ (listaDatosCliente.getListDatosCliente() != null ? listaDatosCliente.getListDatosCliente().size() : 0));
+
+			String mensaje = PropertiesInternos.STRING_EMPTY;
+			if (listaDatosCliente.getListDatosCliente() != null) {
+				if (!listaDatosCliente.getListDatosCliente().isEmpty()) {
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
+					response.setListDatosCliente(listaDatosCliente);
+					mensaje = resultMap.get("P_MENSAJE") != null ? resultMap.get("P_MENSAJE").toString()
+							: PropertiesInternos.STRING_EMPTY;
+				} else {
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
+					mensaje = Constantes.CURSOR_VACIO;
+				}
+			} else {
+				mensaje = resultMap.get("P_MENSAJE") != null ? resultMap.get("P_MENSAJE").toString()
+						: PropertiesInternos.STRING_EMPTY;
+			}
+			response.setO_msg(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = " 
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
+				
+		} catch (Exception e) {
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
+			String error = e.toString();
+			String codError = PropertiesInternos.STRING_EMPTY;
+			String msjError = PropertiesInternos.STRING_EMPTY;
+			if (error.toUpperCase(Locale.getDefault())
+					.contains(propiedadesExterna.dbErrorSqlTimeOutException.toUpperCase(Locale.getDefault()))) {
+				codError = propiedadesExterna.codConsultaClienteCESIdt1;
+				msjError = propiedadesExterna.msjConsultaClienteCESIdt1;
+			} else {
+				codError = propiedadesExterna.codConsultaClienteCESIdt2;
+				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
+			}
+			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
+					.replace("$sp", propiedadesExterna.spsgassListaDatosCLiente).replace("$msg", error));
+		} finally {
+            try {
+                Utilitario.close(mensajeLog, conexion);
+            } catch (SQLException e) {
+                logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+            }
+		}
+		
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
+		return response;
+	}
+	
 }

@@ -1,4 +1,3 @@
-
 package pe.com.claro.eai.ws.postventa.consultaclientecesws.types;
 
 import java.util.ArrayList;

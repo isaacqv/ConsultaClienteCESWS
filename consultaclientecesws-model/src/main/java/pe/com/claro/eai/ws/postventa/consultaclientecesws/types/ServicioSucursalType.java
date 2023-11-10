@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Clase Java para ServicioSucursalType complex type.
- *
+ * 
  * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
- *
+ * 
  * <pre>
  * &lt;complexType name="ServicioSucursalType">
  *   &lt;complexContent>
@@ -27,16 +27,16 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- *
- *
+ * 
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ServicioSucursalType", propOrder = {
-        "tipoServicio",
-        "codigoServicio",
-        "numero",
-        "servicio",
-        "validoDesde"
+    "tipoServicio",
+    "codigoServicio",
+    "numero",
+    "servicio",
+    "validoDesde"
 })
 public class ServicioSucursalType {
 
@@ -53,11 +53,11 @@ public class ServicioSucursalType {
 
     /**
      * Obtiene el valor de la propiedad tipoServicio.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getTipoServicio() {
         return tipoServicio;
@@ -65,11 +65,11 @@ public class ServicioSucursalType {
 
     /**
      * Define el valor de la propiedad tipoServicio.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setTipoServicio(String value) {
         this.tipoServicio = value;
@@ -77,11 +77,11 @@ public class ServicioSucursalType {
 
     /**
      * Obtiene el valor de la propiedad codigoServicio.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getCodigoServicio() {
         return codigoServicio;
@@ -89,11 +89,11 @@ public class ServicioSucursalType {
 
     /**
      * Define el valor de la propiedad codigoServicio.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setCodigoServicio(String value) {
         this.codigoServicio = value;
@@ -101,11 +101,11 @@ public class ServicioSucursalType {
 
     /**
      * Obtiene el valor de la propiedad numero.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getNumero() {
         return numero;
@@ -113,11 +113,11 @@ public class ServicioSucursalType {
 
     /**
      * Define el valor de la propiedad numero.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setNumero(String value) {
         this.numero = value;
@@ -125,11 +125,11 @@ public class ServicioSucursalType {
 
     /**
      * Obtiene el valor de la propiedad servicio.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getServicio() {
         return servicio;
@@ -137,11 +137,11 @@ public class ServicioSucursalType {
 
     /**
      * Define el valor de la propiedad servicio.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setServicio(String value) {
         this.servicio = value;
@@ -149,11 +149,11 @@ public class ServicioSucursalType {
 
     /**
      * Obtiene el valor de la propiedad validoDesde.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getValidoDesde() {
         return validoDesde;
@@ -161,11 +161,11 @@ public class ServicioSucursalType {
 
     /**
      * Define el valor de la propiedad validoDesde.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setValidoDesde(String value) {
         this.validoDesde = value;
