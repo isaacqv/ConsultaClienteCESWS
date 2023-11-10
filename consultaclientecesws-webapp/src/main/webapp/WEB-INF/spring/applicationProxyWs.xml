@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:ws="http://jax-ws.dev.java.net/spring/core"
+	xmlns:wss="http://jax-ws.dev.java.net/spring/servlet"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                           http://www.springframework.org/schema/task
+                           http://www.springframework.org/schema/task/spring-task-3.1.xsd
+                           http://www.springframework.org/schema/aop  
+                           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd  
+                           http://www.springframework.org/schema/context  
+                           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                           http://www.springframework.org/schema/jee
+                           http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util-3.1.xsd
+                           http://jax-ws.dev.java.net/spring/core
+                           http://jax-ws.dev.java.net/spring/core.xsd
+                           http://jax-ws.dev.java.net/spring/servlet
+                           http://jax-ws.dev.java.net/spring/servlet.xsd">
+
+	<!-- ************** [PROXY SOURCE ConsultaLineaCuentaWS - (JNDI-WebLogic)]  ************** -->
+
+	<util:map id="jaxwsConsultarLineaCuentaServiceTimeOut">
+		<entry key="com.sun.xml.ws.request.timeout">
+			<value type="java.lang.Integer">${ws.consulta.linea.cuenta.cbiows.request.timeout} </value>
+		</entry>
+		<entry key="com.sun.xml.ws.connect.timeout">
+			<value type="java.lang.Integer">${ws.consulta.linea.cuenta.cbiows.connection.timeout} </value>
+		</entry>
+	</util:map>
+
+	<bean id="portType"
+		class="org.springframework.remoting.jaxws.JaxWsPortProxyFactoryBean">
+		<property name="wsdlDocumentUrl" value="${ws.consulta.linea.cuenta.cbiows.url}" />
+		<property name="namespaceUri" value="http://claro.com.pe/SOA/service/ConsultaLineaCuentaWS" />
+		<property name="serviceName" value="ConsultaLineaCuentaWSService" />
+		<property name="portName" value="ebsConsultaLineaCuentaWSSB11" />
+		<property name="serviceInterface" value="pe.com.claro.soa.service.consultalineacuentaws.ConsultaLineaCuentaWSPortType" />
+		<property name="customProperties"> <ref local="jaxwsConsultarLineaCuentaServiceTimeOut" /> </property>
+		<property name="lookupServiceOnStartup" value="false" />
+	</bean>
+	
+	<!-- ************** [PROXY SOURCE DatosRazonWS - (JNDI-WebLogic)]  ************** -->
+
+	<util:map id="jaxwsDatosRazonServiceTimeOut">
+		<entry key="com.sun.xml.ws.request.timeout">
+			<value type="java.lang.Integer">${ws.soap.datosRazonWS.connectionTimeout} </value>
+		</entry>
+		<entry key="com.sun.xml.ws.connect.timeout">
+			<value type="java.lang.Integer">${ws.soap.datosRazonWS.readTimeout} </value>
+		</entry>
+	</util:map>
+
+	<bean id="portTypeDatosRazonWS"
+		class="org.springframework.remoting.jaxws.JaxWsPortProxyFactoryBean">
+		<property name="wsdlDocumentUrl" value="${ws.soap.datosRazonWS.uri}" />
+		<property name="namespaceUri" value="http://claro.com.pe/eai/ws/postventa/datosrazonws/" />
+		<property name="serviceName" value="DatosRazonWSWSService" />
+		<property name="portName" value="ebsDatosRazonWSSB12" />
+		<property name="serviceInterface" value="pe.com.claro.eai.ws.postventa.datosrazonws.DatosRazonWSPortType" />
+		<property name="customProperties"> <ref local="jaxwsDatosRazonServiceTimeOut" /> </property>
+		<property name="lookupServiceOnStartup" value="false" />
+	</bean>
+	
+	<!-- ************** [PROXY SOURCE CON_TICKLERS_SEARCH - (JNDI-WebLogic)]  ************** -->
+
+	<util:map id="jaxwsConTicketsSearchServiceTimeOut">
+		<entry key="com.sun.xml.ws.request.timeout">
+			<value type="java.lang.Integer">${ws.soap.ticklersSearchWS.connectionTimeout} </value>
+		</entry>
+		<entry key="com.sun.xml.ws.connect.timeout">
+			<value type="java.lang.Integer">${ws.soap.ticklersSearchWS.readTimeout} </value>
+		</entry>
+	</util:map>
+
+	<bean id="portTypeConTicketsSearchWS"
+		class="org.springframework.remoting.jaxws.JaxWsPortProxyFactoryBean">
+		<property name="wsdlDocumentUrl" value="${ws.soap.ticklersSearchWS.uri}" />
+		<property name="namespaceUri" value="http://ericsson.com/services/ws_CIL_7" />
+		<property name="serviceName" value="TicklersSearchService" />
+		<property name="portName" value="TicklersSearchServiceSoap11" />
+		<property name="serviceInterface" value="com.ericsson.services.ws_cil_7.TicklersSearchService" />
+		<property name="customProperties"> <ref local="jaxwsConTicketsSearchServiceTimeOut" /> </property>
+		<property name="lookupServiceOnStartup" value="false" />
+	</bean>
+
+</beans>
