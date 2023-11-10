@@ -3,19 +3,12 @@ package pe.com.claro.eai.ws.postventa.consultaclientecesws.service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.xml.ws.Holder;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import com.ericsson.services.ws_cil_7.sessionchange.SessionChangeRequest;
-import com.ericsson.services.ws_cil_7.sessionchange.ValuesListpartRequest;
-import com.ericsson.services.ws_cil_7.sessionchange.ValuesRequest;
-import com.ericsson.services.ws_cil_7.ticklerssearch.InputAttributes;
-import com.ericsson.services.ws_cil_7.ticklerssearch.TicklersSearchRequest;
-import com.ericsson.services.ws_cil_7.ticklerssearch.TicklersSearchResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,31 +16,137 @@ import org.springframework.stereotype.Service;
 import pe.com.claro.eai.ws.baseschema.AuditRequestType;
 import pe.com.claro.eai.ws.baseschema.AuditResponseType;
 import pe.com.claro.eai.ws.baseschema.ParametrosType;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.*;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.client.interfaz.*;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.*;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Cliente;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ClientePorNombre;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClienteRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClienteResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalDTHRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalDTHResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEstadoServiciosRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEstadoServiciosResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarFallaRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarFallaResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarInteraccionCasosRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarInteraccionCasosResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarJanusRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarJanusResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarReglaRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarReglaResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarSeaChangeRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarSeaChangeResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioSucursalRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioSucursalResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGARequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGAResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosIncidencia;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosInfVar;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosProblema;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosSot;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DetalleSucursal;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DetalleSucursalDTH;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Equipo;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.EstadoServicio;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Falla;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Janus;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaClientePorNombre;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.RegistrarAuditoriaRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.RegistrarAuditoriaResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Regla;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.SeaChange;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Servicio;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ServicioSucursal;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Tecnologia;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.TecnologiaSGA;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.client.interfaz.AuthenticationRest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.client.interfaz.ConsultaLineaCuentaCBIOWSClient;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.client.interfaz.IncognitoRest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.client.interfaz.IptvRest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.Bscs9Dao;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.BscsDao;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.ClarifyDao;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.PvuDao;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.SgaDao;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.DBException;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.IDFException;
-//import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.WSException;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.request.AuthenticationRequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.request.IncognitoRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.request.ObtenerServiciosRequest;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.response.AuthenticationResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.response.IncognitoResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.response.ObtenerServiciosResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.*;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ClientePorNombreType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ClienteType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarClientePorNombreRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarClientePorNombreResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarClienteRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarClienteResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarEquipoRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarEquipoResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarFallaRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarFallaResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarInteraccionCasosRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarInteraccionCasosResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarJanusRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarJanusResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarNumeroTelefonoRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarNumeroTelefonoResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarReglaRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarReglaResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarSeaChangeRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarSeaChangeResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarServicioRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarServicioResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarSucursalDetalleRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ConsultarSucursalDetalleResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.DatosIncidenciaType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.DatosInfVarType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.DatosProblemaType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.DatosSotType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.EquipoType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.FallaType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.HeaderRequest;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.HeaderResponse;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.IncognitoHeader;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.JanusType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ListaClienteType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ListaEquipoType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ListaJanusType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ListaReglaType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ListaSeaChangeType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ListaServicioSucursalType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ListaServicioType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ListaSucursalesType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ReconectarNcosRequestType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ReconectarNcosResponseType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ReglaType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ResponseStatus;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.SeaChangeType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.Services;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ServicioSucursalType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.ServicioType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.Subscribers;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.types.SucursalType;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.typesiptv.ChildCursor;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.typesiptv.IptvHeader;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.typesiptv.IptvResponse;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.typesiptv.IptvResquest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.*;
-import pe.com.claro.eai.ws.postventa.datosrazonws.types.ListaReasonType;
-import pe.com.claro.eai.ws.postventa.datosrazonws.types.ObtenerDatosRequest;
-import pe.com.claro.eai.ws.postventa.datosrazonws.types.ObtenerDatosResponse;
-import pe.com.claro.eai.ws.postventa.datosrazonws.types.RequestAuditType;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Constantes;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.JAXBUtilitarios;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.PropertiesInternos;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Propiedades;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Utilitarios;
 import pe.com.claro.soa.message.consultalineacuentaws.ConsultarLineaCuentaRequest;
 import pe.com.claro.soa.message.consultalineacuentaws.ConsultarLineaCuentaResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.WSException;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.WSException;
 
 @Service
 public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService {
@@ -68,7 +167,13 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 	
 	@Autowired
 	private PvuDao pvuDao;
-
+	
+	@Autowired
+	private Bscs9Dao bscs9Dao;
+	
+	@Autowired
+	private ConsultaLineaCuentaCBIOWSClient consultaLineaCuentaCBIOWSClient;
+	
 	@Autowired
 	private AuthenticationRest authenticationRest;
 
@@ -77,21 +182,6 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 
 	@Autowired
 	private IptvRest iptvRest;
-
-	@Autowired
-	private Bscs9Dao bscs9Dao;
-
-	@Autowired
-	private ConsultaLineaCuentaCBIOWSClient consultaLineaCuentaCBIOWSClient;
-
-	@Autowired
-	private DatosRazonClient datosRazonClient;
-
-	@Autowired
-	private TicklersSearchClient ticklersSearchClient;
-
-	@Autowired
-	private ServicioFijaLocalClient servicioFijaLocalClient;
 
 	@Override
 	public ConsultarClienteResponseType consultarCliente(ConsultarClienteRequestType objConsultarClienteRequestType) {		
@@ -112,6 +202,9 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 		ClienteType objClienteType;
 		List<ClienteType> listClienteType = new ArrayList<>();
 
+		boolean flagConvivencia = false;
+		String flagToBe = Constantes.constanteVacio;
+		
 		try {
 			ConsultarClienteResponse objConsultarClienteSgaResponse = new ConsultarClienteResponse();
 			ConsultarClienteResponse objConsultarClienteBscsResponse = new ConsultarClienteResponse();
@@ -124,20 +217,203 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 			LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1 - ConsultarCliente en SGA ---------");
 			objConsultarClienteSgaResponse = sgaDao.consultarCliente(idTransaccion, objConsultarClienteRequest);
 			LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1 - ConsultarCliente en SGA ---------");
-
+		
 			if (propiedadesExterna.criterioSgaCodcli.trim().equals(objConsultarClienteRequest.getTipoBusqueda().trim())) {
-				LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.5 - Obtener datos complementarios de clientes en :" + propiedadesExterna.dbSGADB + " --------- ");
-				String strNumDoc = sgaDao.obtenerNumeroDocumento(idTransaccion, objConsultarClienteRequestType.getValorBusqueda());
-				objConsultarClienteRequest.setTipoBusqueda(propiedadesExterna.criterioBscsDni);
-				objConsultarClienteRequest.setValorBusqueda(strNumDoc);
+					LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.5 - Obtener datos complementarios de clientes en :" + propiedadesExterna.dbSGADB + " --------- ");
+					String strNumDoc = sgaDao.obtenerNumeroDocumento(idTransaccion, objConsultarClienteRequestType.getValorBusqueda());
+					objConsultarClienteRequest.setTipoBusqueda(propiedadesExterna.criterioBscsDni);
+					objConsultarClienteRequest.setValorBusqueda(strNumDoc);		
+			}
+
+			flagConvivencia = (propiedadesExterna.flagConvivencia.equals(Constantes.UNO));
+			
+			if(flagConvivencia) {
+				
+				LOGGER.info(mensajeLog + "[RUTA CONVIVENCIA]");
+				ConsultarNumeroTelefonoResponse consultarNumeroTelefonoResponse = new ConsultarNumeroTelefonoResponse();
+				
+				LOGGER.info(mensajeLog + "[VALIDACION tipoBusqueda]");
+				if( objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.DOS) || objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.CUATRO) ||
+						objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.CINCO)) {
+					
+					LOGGER.info(mensajeLog + "[tipoBusqueda es 2, 4 o 5]");
+					
+					ConsultarLineaCuentaResponse consultarLineaCuentaResponse = new ConsultarLineaCuentaResponse();
+					try {
+						LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.7 - Validar Número migrado ---------");
+						consultarLineaCuentaResponse = consultaLineaCuentaCBIOWSClient.consultarLineaCuenta(mensajeLog, 
+								getConsultarLineaCuentaRequest( objConsultarClienteRequestType, consultarNumeroTelefonoResponse));
+						LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1.7 - Validar Número migrado ---------");
+					} catch(WSException e) {
+						LOGGER.info(mensajeLog + "Error Tecnico: Inicio Actividad Nro 1.7 - Validar Número migrado");						
+					}
+					
+					if(consultarLineaCuentaResponse != null && consultarLineaCuentaResponse.getRptaConsulta() != null &&
+							consultarLineaCuentaResponse.getRptaConsulta().equals(Constantes.UNO) &&
+							consultarLineaCuentaResponse.getCursorDatos()!= null && consultarLineaCuentaResponse.getCursorDatos().getItm()!= null && 
+							(consultarLineaCuentaResponse.getCursorDatos().getItm().get(0).getEstado().equals(Constantes.CEROCERO)
+									|| consultarLineaCuentaResponse.getCursorDatos().getItm().get(0).getEstado().equals(Constantes.CEROUNO) )) {
+						
+						LOGGER.info(mensajeLog + "--------- CURSORDATOS -> ESTADO :: " + consultarLineaCuentaResponse.getCursorDatos().getItm().get(0).getEstado());
+						LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.8 - Consultar cliente (BSCS IX) --------- ");
+						objConsultarClienteBscsResponse = bscs9Dao.consultarCliente(idTransaccion, getObjConsultarClienteRequestBscsIX(objConsultarClienteRequest));
+						LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1.8 - Consultar cliente (BSCS IX) --------- ");
+						flagToBe = Constantes.UNO;
+						
+						if( (objConsultarClienteBscsResponse == null || 
+								(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() == null ) ||
+								(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() != null && objConsultarClienteBscsResponse.getListCliente().getListCliente() == null ) ||
+								(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() != null && objConsultarClienteBscsResponse.getListCliente().getListCliente() != null && 
+										objConsultarClienteBscsResponse.getListCliente().getListCliente().isEmpty())) &&
+								flagConvivencia && (objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SEIS) || objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SIETE)) ) {
+							
+							objConsultarClienteBscsResponse = null;
+							LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+							objConsultarClienteBscsResponse = bscsDao.consultarCliente(idTransaccion, objConsultarClienteRequest);
+							LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+							flagToBe = Constantes.CERO_STR;
+						}
+						
+					} else {
+						LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+						objConsultarClienteBscsResponse = bscsDao.consultarCliente(idTransaccion, objConsultarClienteRequest);
+						LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+						flagToBe = Constantes.CERO_STR;
+					}
+					
+				} else if( objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.UNO) || objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.TRES) ) {
+				
+					LOGGER.info(mensajeLog + "[tipoBusqueda es 1 o 3]");
+
+					LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.6 - Consultar datos Cliente ---------");
+					
+					ConsultarNumeroTelefonoRequest consultarNumeroTelefonoRequest = new ConsultarNumeroTelefonoRequest();
+					
+					consultarNumeroTelefonoRequest.setPiTipobusqueda(objConsultarClienteRequestType.getTipoBusqueda());
+					consultarNumeroTelefonoRequest.setPiValorBusqueda(objConsultarClienteRequestType.getValorBusqueda());
+					consultarNumeroTelefonoRequest.setPiValorBusquedaDoc(Constantes.constanteVacio);
+					consultarNumeroTelefonoResponse = sgaDao.consultarNumeroTelefono(mensajeLog, consultarNumeroTelefonoRequest);
+					
+					LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1.6 - Consultar datos Cliente ---------");
+					
+					if(consultarNumeroTelefonoResponse != null && consultarNumeroTelefonoResponse.getPoCursorNumeroTelefono() != null &&
+							consultarNumeroTelefonoResponse.getPoCursorNumeroTelefono().getListaNumeroTelefono() != null && 
+							!consultarNumeroTelefonoResponse.getPoCursorNumeroTelefono().getListaNumeroTelefono().isEmpty() && 
+							consultarNumeroTelefonoResponse.getPoCursorNumeroTelefono().getListaNumeroTelefono().get(0).getCustomerId() != null && 
+							!consultarNumeroTelefonoResponse.getPoCursorNumeroTelefono().getListaNumeroTelefono().get(0).getCustomerId().equals(Constantes.constanteVacio)) {
+						
+						ConsultarLineaCuentaResponse consultarLineaCuentaResponse = new ConsultarLineaCuentaResponse();
+						try {
+							LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.7 - Validar Número migrado ---------");
+							consultarLineaCuentaResponse = consultaLineaCuentaCBIOWSClient.consultarLineaCuenta(mensajeLog, 
+									getConsultarLineaCuentaRequest( objConsultarClienteRequestType, consultarNumeroTelefonoResponse));
+							LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1.7 - Validar Número migrado ---------");
+						} catch(WSException e) {
+							LOGGER.info(mensajeLog + "Error Tecnico: Inicio Actividad Nro 1.7 - Validar Número migrado");							
+						}
+						
+						if(consultarLineaCuentaResponse != null && consultarLineaCuentaResponse.getRptaConsulta() != null &&
+								consultarLineaCuentaResponse.getRptaConsulta().equals(Constantes.UNO) ) {
+							LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.8 - Consultar cliente (BSCS IX) --------- ");
+							objConsultarClienteBscsResponse = bscs9Dao.consultarCliente(idTransaccion, getObjConsultarClienteRequestBscsIX(objConsultarClienteRequest));
+							LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1.8 - Consultar cliente (BSCS IX) --------- ");
+							flagToBe = Constantes.UNO;
+							
+							if( (objConsultarClienteBscsResponse == null || 
+									(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() == null ) ||
+									(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() != null && objConsultarClienteBscsResponse.getListCliente().getListCliente() == null ) ||
+									(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() != null && objConsultarClienteBscsResponse.getListCliente().getListCliente() != null && 
+											objConsultarClienteBscsResponse.getListCliente().getListCliente().isEmpty())) &&
+									flagConvivencia && (objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SEIS) || objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SIETE)) ) {
+								
+								objConsultarClienteBscsResponse = null;
+								LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+								objConsultarClienteBscsResponse = bscsDao.consultarCliente(idTransaccion, objConsultarClienteRequest);
+								LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+								flagToBe = Constantes.CERO_STR;
+								
+							}
+							
+						} else {
+							LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+							objConsultarClienteBscsResponse = bscsDao.consultarCliente(idTransaccion, objConsultarClienteRequest);
+							LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+							flagToBe = Constantes.CERO_STR;
+						}
+					
+					} else {
+						/*LOGGER.info(mensajeLog + "Lista de Numero de telefono o CustomerId es vacio o nulo");						
+						objAuditResponseType.setCodigoRespuesta(propiedadesExterna.IDF4CODIGO);
+						objAuditResponseType.setMensajeRespuesta(propiedadesExterna.IDF4MENSAJE.replace("$bd", propiedadesExterna.dbSGADB)
+								.replace("$ws", propiedadesExterna.pkgSicesFailure + "." + propiedadesExterna.spSicessNumberPhone).replace("$act", "Actividad Nro 1.6"));
+						objAuditResponseType.setIdTransaccion(objConsultarClienteRequestType.getAuditRequest().getIdTransaccion());
+						objListaClienteType.setCliente(listClienteType);
+						response.setAuditResponse(objAuditResponseType);
+						response.setListaCliente(objListaClienteType);
+						response.setListaResponseOpcional(objParametrosType);
+						
+						return response;	*/
+						LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+						objConsultarClienteBscsResponse = bscsDao.consultarCliente(idTransaccion, objConsultarClienteRequest);
+						LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+						flagToBe = Constantes.CERO_STR;
+						
+					}
+					
+				} else if( objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SEIS) || objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SIETE) ) {
+					
+					LOGGER.info(mensajeLog + "[tipoBusqueda es 6 o 7]");
+					
+					LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.8 - Consultar cliente (BSCS IX) --------- ");
+					objConsultarClienteBscsResponse = bscs9Dao.consultarCliente(idTransaccion, getObjConsultarClienteRequestBscsIX(objConsultarClienteRequest));
+					LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1.8 - Consultar cliente (BSCS IX) --------- ");
+					flagToBe = Constantes.UNO;
+					
+					if( (objConsultarClienteBscsResponse == null || 
+							(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() == null ) ||
+							(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() != null && objConsultarClienteBscsResponse.getListCliente().getListCliente() == null ) ||
+							(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() != null && objConsultarClienteBscsResponse.getListCliente().getListCliente() != null && 
+									objConsultarClienteBscsResponse.getListCliente().getListCliente().isEmpty())) && flagConvivencia && (objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SEIS) || 
+											objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SIETE)) ) {
+						
+						objConsultarClienteBscsResponse = null;
+						LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+						objConsultarClienteBscsResponse = bscsDao.consultarCliente(idTransaccion, objConsultarClienteRequest);
+						LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+						flagToBe = Constantes.CERO_STR;
+						
+					}
+					
+				}
+			
+			} else {
+				LOGGER.info(mensajeLog + "[RUTA NO CONVIVENCIA]");
+				LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.8 - Consultar cliente (BSCS IX) --------- ");
+				objConsultarClienteBscsResponse = bscs9Dao.consultarCliente(idTransaccion, getObjConsultarClienteRequestBscsIX(objConsultarClienteRequest));
+				LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1.8 - Consultar cliente (BSCS IX) --------- ");
+				flagToBe = Constantes.UNO;
+				
+				if((objConsultarClienteBscsResponse == null || 
+						(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() == null ) ||
+						(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() != null && objConsultarClienteBscsResponse.getListCliente().getListCliente() == null ) ||
+						(objConsultarClienteBscsResponse != null && objConsultarClienteBscsResponse.getListCliente() != null && objConsultarClienteBscsResponse.getListCliente().getListCliente() != null && 
+								objConsultarClienteBscsResponse.getListCliente().getListCliente().isEmpty())) &&
+						flagConvivencia && (objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SEIS) || objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.SIETE)) ) {//RACH
+					
+					objConsultarClienteBscsResponse = null;
+					LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+					objConsultarClienteBscsResponse = bscsDao.consultarCliente(idTransaccion, objConsultarClienteRequest);
+					LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2 - ConsultarCliente en BSCS --------- ");
+					flagToBe = Constantes.CERO_STR;
+					
+				}
 			}
 			
-			LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1 - ConsultarCliente en BSCS --------- ");
-			objConsultarClienteBscsResponse = bscsDao.consultarCliente(idTransaccion, objConsultarClienteRequest);
-			LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1 - ConsultarCliente en BSCS --------- ");
-			
+			LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 3 - Traer datos complementarios (en SGA) --------- ");
 			objConsultarClienteBscsResponse = consultarClienteComplemento(idTransaccion, mensajeLog, objConsultarClienteBscsResponse);
-			objConsultarClienteResponse = unificarCliente(objConsultarClienteSgaResponse, objConsultarClienteBscsResponse);
+			LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 3 - Traer datos complementarios (en SGA) --------- ");
+			
+			objConsultarClienteResponse = unificarCliente(mensajeLog, objConsultarClienteSgaResponse, objConsultarClienteBscsResponse);
 			
 			if (objConsultarClienteResponse.getMsgRespuesta().equalsIgnoreCase(Constantes.CURSOR_VACIO) || objConsultarClienteResponse.getListCliente() == null) {
 				objAuditResponseType.setCodigoRespuesta(propiedadesExterna.IDF1CODIGO);
@@ -176,6 +452,7 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 					objClienteType.setCorrespElectronica(item.getCorrespElectronica());
 					objClienteType.setCodSuc(item.getCodSuc());
 					objClienteType.setNumSlc(item.getNumSlc());
+					objClienteType.setFlagToBe(flagToBe);
 					listClienteType.add(objClienteType);
 				}
 				
@@ -227,7 +504,13 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 		ParametrosType objParametrosType = new ParametrosType();
 		ClientePorNombreType objClientePorNombreType;
 		List<ClientePorNombreType> listClientePorNombreType = new ArrayList<ClientePorNombreType>();
+		
+		boolean flagConvivencia = false;
+		
 		try {
+			
+			flagConvivencia = (propiedadesExterna.flagConvivencia.equals(Constantes.UNO));
+			
 			ConsultarClientePorNombreResponse objConsultarClientePorNombreResponse = new ConsultarClientePorNombreResponse();
 			ConsultarClientePorNombreResponse objConsultarClientePorNombreResponseBscs = new ConsultarClientePorNombreResponse();
 			ConsultarClientePorNombreResponse objConsultarClientePorNombreResponseSga = new ConsultarClientePorNombreResponse();
@@ -235,7 +518,62 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 			objConsultarClientePorNombreRequest.setTipobusqueda(objConsultarClientePorNombreRequestType.getTipoBusqueda());
 			objConsultarClientePorNombreRequest.setValor_busqueda(objConsultarClientePorNombreRequestType.getValorBusqueda());
 			
-			objConsultarClientePorNombreResponseBscs = bscsDao.consultarClientePorNombre(idTransaccion, objConsultarClientePorNombreRequest);
+			ConsultarClienteResponse consultarClienteBscsResponse = new ConsultarClienteResponse();
+			ConsultarClienteRequest ConsultarClienteRequest= new ConsultarClienteRequest();
+			ConsultarClienteRequest.setTipoBusqueda(objConsultarClientePorNombreRequestType.getTipoBusqueda());
+			ConsultarClienteRequest.setValorBusqueda(objConsultarClientePorNombreRequestType.getValorBusqueda());
+			
+			if(flagConvivencia) {
+				LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 0 - Consultar cliente  Nombre (BSCS IX) ---------");
+				consultarClienteBscsResponse = bscs9Dao.consultarCliente(idTransaccion, ConsultarClienteRequest);
+				LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 0 - Consultar cliente  Nombre (BSCS IX) ---------");
+				if(consultarClienteBscsResponse != null && consultarClienteBscsResponse.getListCliente() != null &&
+						consultarClienteBscsResponse.getListCliente().getListCliente() !=null &&
+						!consultarClienteBscsResponse.getListCliente().getListCliente().isEmpty()) {
+					
+					objConsultarClientePorNombreResponseBscs.setCodRespuesta(propiedadesExterna.IDF0CODIGO);
+					objConsultarClientePorNombreResponseBscs.setMsgRespuesta(propiedadesExterna.IDF0MENSAJE);
+					objConsultarClientePorNombreResponseBscs.setListClientePorNombre(new ListaClientePorNombre());
+					objConsultarClientePorNombreResponseBscs.getListClientePorNombre().setListClientePorNombre(new ArrayList<>());
+					for( Cliente itm : consultarClienteBscsResponse.getListCliente().getListCliente() ) {
+						ClientePorNombre clientePorNombre = new ClientePorNombre();
+						clientePorNombre.setApellidos(itm.getApellidos());
+						clientePorNombre.setCcname(itm.getCcname());
+						clientePorNombre.setNombres(itm.getNombres());
+						clientePorNombre.setNumDoc(itm.getNumDoc());
+						clientePorNombre.setTipoDoc(itm.getTipoDoc());
+						objConsultarClientePorNombreResponseBscs.getListClientePorNombre().getListClientePorNombre().add(clientePorNombre);
+					}
+					
+				} else {
+					LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1 - Consultar cliente (en BSCS) ---------");
+					objConsultarClientePorNombreResponseBscs = bscsDao.consultarClientePorNombre(idTransaccion, objConsultarClientePorNombreRequest);
+					LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1 - Consultar cliente (en BSCS) ---------");
+				}
+			} else {
+				LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 0 - Consultar cliente  Nombre (BSCS IX) ---------");
+				consultarClienteBscsResponse = bscs9Dao.consultarCliente(idTransaccion, ConsultarClienteRequest);
+				LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 0 - Consultar cliente  Nombre (BSCS IX) ---------");
+				if(consultarClienteBscsResponse != null && consultarClienteBscsResponse.getListCliente() != null &&
+						consultarClienteBscsResponse.getListCliente().getListCliente() !=null &&
+						!consultarClienteBscsResponse.getListCliente().getListCliente().isEmpty()) {
+					
+					objConsultarClientePorNombreResponseBscs.setCodRespuesta(propiedadesExterna.IDF0CODIGO);
+					objConsultarClientePorNombreResponseBscs.setMsgRespuesta(propiedadesExterna.IDF0MENSAJE);
+					objConsultarClientePorNombreResponseBscs.setListClientePorNombre(new ListaClientePorNombre());
+					objConsultarClientePorNombreResponseBscs.getListClientePorNombre().setListClientePorNombre(new ArrayList<>());
+					for( Cliente itm : consultarClienteBscsResponse.getListCliente().getListCliente() ) {
+						ClientePorNombre clientePorNombre = new ClientePorNombre();
+						clientePorNombre.setApellidos(itm.getApellidos());
+						clientePorNombre.setCcname(itm.getCcname());
+						clientePorNombre.setNombres(itm.getNombres());
+						clientePorNombre.setNumDoc(itm.getNumDoc());
+						clientePorNombre.setTipoDoc(itm.getTipoDoc());
+						objConsultarClientePorNombreResponseBscs.getListClientePorNombre().getListClientePorNombre().add(clientePorNombre);
+					}
+				}
+			}
+			
 			objConsultarClientePorNombreResponseSga = sgaDao.consultarClientePorNombre(idTransaccion, objConsultarClientePorNombreRequest);
 			
 			objConsultarClientePorNombreResponse = unificarClientePorNombre(objConsultarClientePorNombreResponseBscs, objConsultarClientePorNombreResponseSga);
@@ -695,18 +1033,9 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 		ServicioType objServicioType;
 		List<ServicioType> listServicioType = new ArrayList<ServicioType>();
 
-		boolean flagActividad2 = false;
-		boolean flagActividad3 = false;
-		ObtenerServiciosResponse obtenerServiciosResponse = new ObtenerServiciosResponse();
-		TicklersSearchResponse ticklersSearchResponse = new TicklersSearchResponse();
-		TicklersSearchRequest ticklersSearchRequest = new TicklersSearchRequest();
-		ObtenerDatosResponse obtenerDatosResponse = new ObtenerDatosResponse();
-		ObtenerDatosRequest obtenerDatosRequest = new ObtenerDatosRequest();
-
-		try {
+		try {			
 			ConsultarServicioRequest objConsultarServicioRequest = new ConsultarServicioRequest(objConsultarServicioRequestType, propiedadesExterna.plataformaSga, propiedadesExterna.plataformaBscs);
 			ConsultarServicioResponse objConsultarServicioResponse = new ConsultarServicioResponse();
-			ObtenerDatosClienteResponse objObtenerDatosClienteResponse = new ObtenerDatosClienteResponse();
 
 			switch (objConsultarServicioRequest.getCodplataforma()) {
 				case 0: {
@@ -714,228 +1043,8 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 					break;
 				}
 				case 1: {
-
-					ConsultarLineaCuentaRequest consultarLineaCuentaRequest = new ConsultarLineaCuentaRequest();
-					ConsultarLineaCuentaResponse consultarLineaCuentaResponse = new ConsultarLineaCuentaResponse();
-
-					if(propiedadesExterna.flagConvivenciaConServicio.equals(Constantes.UNO)){
-
-						LOGGER.info(mensajeLog + "[RUTA CONVIVENCIA]");
-
-						try {
-							LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 1.0 Consultar PIVOT ---------");
-							consultarLineaCuentaRequest.setTipoConsulta(propiedadesExterna.valorTipoConsultaConServicio);
-							consultarLineaCuentaRequest.setValorConsulta(objConsultarServicioRequestType.getCoId());
-							consultarLineaCuentaResponse = consultaLineaCuentaCBIOWSClient.consultarLineaCuenta(mensajeLog, consultarLineaCuentaRequest);
-
-							if(consultarLineaCuentaResponse != null && consultarLineaCuentaResponse.getRptaConsulta() != null &&
-									consultarLineaCuentaResponse.getRptaConsulta().equals(Constantes.UNO) &&
-									consultarLineaCuentaResponse.getCursorDatos()!= null && consultarLineaCuentaResponse.getCursorDatos().getItm()!= null &&
-									(consultarLineaCuentaResponse.getCursorDatos().getItm().get(0).getEstado().equals(Constantes.CEROCERO)
-											|| consultarLineaCuentaResponse.getCursorDatos().getItm().get(0).getEstado().equals(Constantes.CEROUNO) )) {
-								LOGGER.info(mensajeLog + "--------- CURSOR DATOS --> ESTADO::::: " + consultarLineaCuentaResponse.getCursorDatos().getItm().get(0).getEstado());
-
-								objObtenerDatosClienteResponse = sgaDao.obtenerDatosCliente(idTransaccion, objConsultarServicioRequestType.getCoId());
-
-								if(objObtenerDatosClienteResponse !=null && objObtenerDatosClienteResponse.getO_error().equals(Constantes.CERO_STR) &&
-										( objObtenerDatosClienteResponse.getListDatosCliente().getListDatosCliente().get(0).getC_tecnologia()!=null
-												|| !objObtenerDatosClienteResponse.getListDatosCliente().getListDatosCliente().get(0).getC_tecnologia().isEmpty()))
-								{
-									flagActividad2 = true;
-									LOGGER.info(mensajeLog + "flag continuar actividad Nro 2... ACTIVADO");
-								} else {
-									LOGGER.info(mensajeLog + "--------- Valores nulos en el response SP:SGASS_LISTADATOSCLIENTE ---------");
-									LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2.0 Obtener Tecnologia PKG_POSTVENTA_ONE.SGASS_LISTADATOSCLIENTE ---------");
-									throw new IDFException(propiedadesExterna.IDF3CODIGO, propiedadesExterna.IDF3MENSAJE
-											.replace("$act", Constantes.ACT2_0).replace("$ws", propiedadesExterna.spsgassListaDatosCLiente));
-								}
-
-							} else {
-								flagActividad3 = true;
-								LOGGER.info(mensajeLog + "flag dirigir a la actividad Nro 3... ACTIVADO");
-							}
-
-						} catch (WSException e) {
-							flagActividad3 = true;
-							LOGGER.info(mensajeLog + "flag dirigir a la actividad Nro 3... ACTIVADO");
-						} catch (IDFException e) {
-							objConsultarServicioResponse.setCodRespuesta(e.getCode());
-							objConsultarServicioResponse.setMsgRespuesta(e.getMessage());
-							objConsultarServicioResponse.setListServicio(null);
-							break;
-						} finally {
-							LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1.0 Consultar PIVOT ---------");
-						}
-
-					} else {
-
-						LOGGER.info(mensajeLog + "[RUTA NO CONVIVENCIA]");
-
-						try {
-							objObtenerDatosClienteResponse = sgaDao.obtenerDatosCliente(idTransaccion, objConsultarServicioRequestType.getCoId());
-
-							if(objObtenerDatosClienteResponse !=null && objObtenerDatosClienteResponse.getO_error().equals(Constantes.CERO) &&
-									( objObtenerDatosClienteResponse.getListDatosCliente().getListDatosCliente().get(0).getC_tecnologia()!=null
-											|| !objObtenerDatosClienteResponse.getListDatosCliente().getListDatosCliente().get(0).getC_tecnologia().isEmpty()))
-							{
-								flagActividad2 = true;
-								LOGGER.info(mensajeLog + "flag continuar actividad Nro 2... ACTIVADO");
-							}else {
-								LOGGER.info(mensajeLog + "--------- Valores nulos en el response SP:SGASS_LISTADATOSCLIENTE ---------");
-								LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2.0 Obtener Tecnologia PKG_POSTVENTA_ONE.SGASS_LISTADATOSCLIENTE ---------");
-								throw new IDFException(propiedadesExterna.IDF3CODIGO, propiedadesExterna.IDF3MENSAJE
-										.replace("$act", Constantes.ACT2_0).replace("$ws", propiedadesExterna.spsgassListaDatosCLiente));
-							}
-						} catch (IDFException e) {
-							objConsultarServicioResponse.setCodRespuesta(e.getCode());
-							objConsultarServicioResponse.setMsgRespuesta(e.getMessage());
-							objConsultarServicioResponse.setListServicio(null);
-							break;
-						}finally {
-							LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 1.0 Consultar PIVOT ---------");
-						}
-					}
-
-					if(flagActividad2){
-
-						try {
-							LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2.1 Consultar Servicio claro-post-serviciosFija/ObtenerServicio ---------");
-							obtenerServiciosResponse = servicioFijaLocalClient.obtenerServicios(requestObtenerServicios(objConsultarServicioRequestType, objObtenerDatosClienteResponse.getListDatosCliente().getListDatosCliente().get(0).getC_tecnologia() , propiedadesExterna),
-									idTransaccion, requestHeader(idTransaccion, propiedadesExterna), propiedadesExterna);
-
-							if(obtenerServiciosResponse.getObtenerServiciosResponseType() != null &&
-									obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData() != null &&
-									obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados() != null &&
-									obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().size() > Constantes.CERO) {
-
-								String paramTipoPOExcluido = propiedadesExterna.paramTipoPOExcluido;
-								LOGGER.info(mensajeLog + "Filtrar ListaServiciosAsignados");
-								LOGGER.info(mensajeLog + "No considerar el registro con valor tipoPO: " + paramTipoPOExcluido);
-
-								obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().removeIf(s -> s.getTipoPO().equals(paramTipoPOExcluido));
-
-								LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2.1 Consultar Servicio claro-post-serviciosFija/ObtenerServicio ---------");
-
-								if(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getCoIdPub() == null
-										|| obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getCoIdPub().equals(Constantes.constanteVacio)) {
-									LOGGER.info(mensajeLog + "--------- No se obtuvo CoIdPub() para continuar con la Actividad Nro 2.1 Consultar WS: TicklerSearch ---------");
-									LOGGER.info(mensajeLog + "--------- Inicio - Cargando objeto ConsultarServicioResponse Final ---------");
-									objConsultarServicioResponse = cargarDatosConsultarServicioResponseAct2(idTransaccion, obtenerServiciosResponse);
-									LOGGER.info(mensajeLog + "--------- Fin - Cargando objeto ConsultarServicioResponse Final ---------");
-									break;
-								}
-
-								LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2.2 Consultar Servicio Tickler Search ---------");
-								InputAttributes inputAttributes = new InputAttributes();
-								inputAttributes.setTickStatus(propiedadesExterna.TICKET_STATUS);
-								inputAttributes.setCoIdPub(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getCoIdPub());
-
-								String key = propiedadesExterna.key;
-								String value = propiedadesExterna.value;
-
-								ticklersSearchRequest.setInputAttributes(inputAttributes);
-
-								SessionChangeRequest sessionChangeRequest = new SessionChangeRequest();
-								ValuesRequest value2 = new ValuesRequest();
-								ValuesListpartRequest arg0 = new ValuesListpartRequest();
-								arg0.setKey(key);
-								arg0.setValue(value);
-								value2.getItem().add(arg0);
-								sessionChangeRequest.setValues(value2);
-								ticklersSearchRequest.setSessionChangeRequest(sessionChangeRequest);
-
-								ticklersSearchResponse = ticklersSearchClient.ticklersSearch(ticklersSearchRequest, idTransaccion);
-
-								if (ticklersSearchResponse.getResult() != null && ticklersSearchResponse.getResult().getItem().size() > Constantes.CERO) {
-
-									LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2.2 Consultar Servicio Tickler Search ---------");
-									if(ticklersSearchResponse.getResult().getItem().get(0).getTickLdes().equals(Constantes.constanteVacio)
-											||  ticklersSearchResponse.getResult().getItem().get(0).getTickLdes() == null) {
-										LOGGER.info(mensajeLog + "--------- No se obtuvo TickLdes() ---> CodBloqueo para continuar con la Actividad Nro 2.2 Consultar WS: Datos RazonWS ---------");
-										LOGGER.info(mensajeLog + "--------- Inicio - Cargando objeto ConsultarServicioResponse Final ---------");
-										objConsultarServicioResponse = cargarDatosConsultarServicioResponseAct2_1(idTransaccion, obtenerServiciosResponse, ticklersSearchResponse);
-										LOGGER.info(mensajeLog + "--------- Fin - Cargando objeto ConsultarServicioResponse Final ---------");
-										break;
-									}
-
-									LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 2.3 Consultar Servicio Datos RazonWS  ---------");
-									RequestAuditType requestAuditType = new RequestAuditType();
-									requestAuditType.setIdTransaccion(idTransaccion);
-									requestAuditType.setIpAplicacion(propiedadesExterna.WS_SOAP_datosRazonWS_header_ipAplicacion);
-									requestAuditType.setNombreAplicacion(propiedadesExterna.WS_SOAP_datosRazonWS_header_nombreAplicacion);
-									requestAuditType.setUsuarioAplicacion(propiedadesExterna.WS_SOAP_datosRazonWS_header_usuarioAplicacion);
-
-									ListaReasonType listaReasonType = new ListaReasonType();
-									listaReasonType.getCodigoRazon().add(ClaroUtil.quitarPalote(ticklersSearchResponse.getResult().getItem().get(0).getTickLdes()));
-									obtenerDatosRequest.setRequestAudit(requestAuditType);
-									obtenerDatosRequest.setListaRazon(listaReasonType);
-									obtenerDatosResponse = datosRazonClient.obtenerDatos(obtenerDatosRequest, idTransaccion);
-
-									if(obtenerDatosResponse.getResponseAudit().getCodigoRespuesta().equals(Constantes.EJECUCION_CORRECTA_STRING)
-											&& obtenerDatosResponse.getListaMotivosReason() != null && obtenerDatosResponse.getListaMotivosReason().size() > Constantes.CERO) {
-
-										LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2.3 Consultar Servicio Datos RazonWS  ---------");
-
-										if(obtenerDatosResponse.getListaMotivosReason().get(0).getDescripcionRazon().equals(Constantes.constanteVacio)
-												|| obtenerDatosResponse.getListaMotivosReason().get(0).getDescripcionRazon() == null) {
-											LOGGER.info(mensajeLog + "--------- No se obtuvo respuesta con dato DescripcionRazon() --> Bloqueo ---------");
-											LOGGER.info(mensajeLog + "--------- Inicio - Cargando objeto ConsultarServicioResponse Final ---------");
-											objConsultarServicioResponse = cargarDatosConsultarServicioResponseAct2_1(idTransaccion, obtenerServiciosResponse, ticklersSearchResponse);
-											LOGGER.info(mensajeLog + "--------- Fin - Cargando objeto ConsultarServicioResponse Final ---------");
-											break;
-										}
-
-										LOGGER.info(mensajeLog + "--------- Inicio - Cargando objecto ConsultarServicioResponse Final ---------");
-										objConsultarServicioResponse = cargarDatosConsultarServicioResponse(idTransaccion, obtenerServiciosResponse,
-												ticklersSearchResponse, obtenerDatosResponse);
-										LOGGER.info(mensajeLog + "--------- Fin - Cargando objecto ConsultarServicioResponse Final ---------");
-										break;
-
-									} else {
-										LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2.3 Consultar Servicio Datos RazonWS  ---------");
-
-										LOGGER.info(mensajeLog + "--------- No se obtuvo datos para continuar con la Actividad Nro 2.2 Consultar WS: Datos RazonWS ---------");
-										LOGGER.info(mensajeLog + "--------- Inicio - Cargando objeto ConsultarServicioResponse Final ---------");
-										objConsultarServicioResponse = cargarDatosConsultarServicioResponseAct2_1(idTransaccion, obtenerServiciosResponse, ticklersSearchResponse);
-										LOGGER.info(mensajeLog + "--------- Fin - Cargando objeto ConsultarServicioResponse Final ---------");
-										break;
-									}
-
-								} else {
-									LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2.2 Consultar Servicio Tickler Search ---------");
-
-									LOGGER.info(mensajeLog + "--------- No se obtuvo datos para continuar con la Actividad Nro 2.2 Consultar WS: Datos RazonWS ---------");
-									LOGGER.info(mensajeLog + "--------- Inicio - Cargando objeto ConsultarServicioResponse Final ---------");
-									objConsultarServicioResponse = cargarDatosConsultarServicioResponseAct2(idTransaccion, obtenerServiciosResponse);
-									LOGGER.info(mensajeLog + "--------- Fin - Cargando objeto ConsultarServicioResponse Final ---------");
-									break;
-								}
-
-							} else {
-								LOGGER.info(mensajeLog + "--------- Faltan valores de campos requeridos de respuesta del WS:claro-post-serviciosFija ---------");
-								LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 2.1 Consultar Servicio claro-post-serviciosFija/ObtenerServicio ---------");
-								throw new IDFException(propiedadesExterna.IDF3CODIGO, propiedadesExterna.IDF3MENSAJE
-										.replace("$act", Constantes.ACT2_1).replace("$ws", propiedadesExterna.WS_REST_serviciosFija_NOMBRE));
-							}
-
-						} catch (WSException e) {
-							objConsultarServicioResponse.setCodRespuesta(e.getCode());
-							objConsultarServicioResponse.setMsgRespuesta(e.getMessage());
-							objConsultarServicioResponse.setListServicio(null);
-							break;
-						} catch (IDFException e) {
-							objConsultarServicioResponse.setCodRespuesta(e.getCode());
-							objConsultarServicioResponse.setMsgRespuesta(e.getMessage());
-							objConsultarServicioResponse.setListServicio(null);
-							break;
-						}
-					}
-
-					if(flagActividad3){
-						objConsultarServicioResponse = bscsDao.consultarServicio(idTransaccion, objConsultarServicioRequest);
-						break;
-					}
-
+					objConsultarServicioResponse = bscsDao.consultarServicio(idTransaccion, objConsultarServicioRequest);
+					break;
 				}
 				case -1: {
 					String strMsg = "Se requiere el valor de PLATAFORMA [" + propiedadesExterna.plataformaBscs + " o " + propiedadesExterna.plataformaSga + "]";
@@ -949,20 +1058,20 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 
 			if (objConsultarServicioResponse.getMsgRespuesta().equalsIgnoreCase(Constantes.CURSOR_VACIO) || objConsultarServicioResponse.getListServicio() == null) {
 				objAuditResponseType.setCodigoRespuesta(propiedadesExterna.IDF1CODIGO);
-				objAuditResponseType.setMensajeRespuesta(propiedadesExterna.IDF1MENSAJEV2
-						.replace("$bd", Constantes.FLUJO)
-						.replace("$sp", objConsultarServicioRequest.getCodplataforma() == 0 ? propiedadesExterna.plataformaSga : propiedadesExterna.plataformaBscs)
+				objAuditResponseType.setMensajeRespuesta(propiedadesExterna.IDF1MENSAJE
+						.replace("$bd", objConsultarServicioRequest.getCodplataforma() == 0 ? propiedadesExterna.dbSGADB : propiedadesExterna.dbBSCSDB)
+						.replace("$sp", objConsultarServicioRequest.getCodplataforma() == 0 ? propiedadesExterna.spSicess_servicesga : propiedadesExterna.spSicess_servicebscs)
 						.replace("$cod", objConsultarServicioResponse.getCodRespuesta())
 						.replace("$msg", objConsultarServicioResponse.getMsgRespuesta()));
 				objAuditResponseType.setIdTransaccion(objConsultarServicioRequestType.getAuditRequest().getIdTransaccion());
-
+				
 				response.setAuditResponse(objAuditResponseType);
 				response.setListaServicio(objListaServicioType);
 				response.setListaResponseOpcional(objParametrosType);
-
+				
 			} else {
 				for (Servicio item : objConsultarServicioResponse.getListServicio().getListServicio()) {
-					objServicioType = new ServicioType();
+					objServicioType = new ServicioType();					
 					objServicioType.setGrupo(item.getGrupo());
 					objServicioType.setServicio(item.getServicio());
 					objServicioType.setEstado(item.getEstado());
@@ -978,8 +1087,8 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 				objAuditResponseType.setMensajeRespuesta(objConsultarServicioResponse.getMsgRespuesta().trim().equals(PropertiesInternos.STRING_EMPTY) ? propiedadesExterna.IDF0MENSAJE : objConsultarServicioResponse.getMsgRespuesta());
 				objAuditResponseType.setIdTransaccion(objConsultarServicioRequestType.getAuditRequest().getIdTransaccion());
 
-				objListaServicioType.setServicio(listServicioType);
-
+				objListaServicioType.setServicio(listServicioType);	
+				
 				response.setAuditResponse(objAuditResponseType);
 				response.setListaServicio(objListaServicioType);
 				response.setListaResponseOpcional(objParametrosType);
@@ -2194,8 +2303,13 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 		 *************/
 		boolean existeFtthVideo = false;
 		try {
-			authenticationResponse = authenticationRest.authentication(authenticationRequest, incognitoHeader,
-					propiedadesExterna);
+			try {
+				authenticationResponse = authenticationRest.authentication(authenticationRequest, incognitoHeader,
+						propiedadesExterna);
+			} catch (pe.com.claro.eai.ws.postventa.consultaclientecesws.util.WSException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if (authenticationResponse.getAuthorization() != null
 					|| !authenticationResponse.getAuthorization().equals(Constantes.TEXTO_VACIO)) {
 				// INVOCAMOS AL SERVICIO DE INCOGNITO
@@ -2289,215 +2403,81 @@ public class ConsultaClienteCESServiceImpl implements ConsultaClienteCESService 
 
 		return lstEquipoTypeITPV;
 	}
+	private ConsultarLineaCuentaRequest getConsultarLineaCuentaRequest( ConsultarClienteRequestType objConsultarClienteRequestType,
+			ConsultarNumeroTelefonoResponse consultarNumeroTelefonoResponse) {
+		
+		ConsultarLineaCuentaRequest consultarLineaCuentaRequest = new ConsultarLineaCuentaRequest();
+		
+		String tipoConsulta = Constantes.constanteVacio;
+		if( objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.DOS) ) {
+			tipoConsulta = Constantes.UNO;
+		} else if( objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.CUATRO) ||
+				objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.UNO) ||
+				objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.TRES) ) {
+			tipoConsulta = Constantes.DOS;
+		} else if( objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.CINCO) ) {
+			tipoConsulta = Constantes.TRES;
+		}
+		
+		consultarLineaCuentaRequest.setTipoConsulta(tipoConsulta);
+		
+		String valorConsulta = Constantes.constanteVacio;
+		if( objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.DOS) ||
+				objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.CUATRO) ||
+				objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.CINCO) ) {
+			valorConsulta = objConsultarClienteRequestType.getValorBusqueda();
+		} else if( objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.UNO) ||
+				objConsultarClienteRequestType.getTipoBusqueda().equals(Constantes.TRES) ) {
+			
+			if(consultarNumeroTelefonoResponse != null && consultarNumeroTelefonoResponse.getPoCursorNumeroTelefono() != null &&
+					consultarNumeroTelefonoResponse.getPoCursorNumeroTelefono().getListaNumeroTelefono() != null && 
+					!consultarNumeroTelefonoResponse.getPoCursorNumeroTelefono().getListaNumeroTelefono().isEmpty() ) {
+				valorConsulta = consultarNumeroTelefonoResponse.getPoCursorNumeroTelefono().getListaNumeroTelefono().get(0).getCustomerId();
+			}
+			
+		}
 
-	public pe.com.claro.eai.ws.postventa.consultaclientecesws.request.HeaderRequest requestHeader(String idTransaccion, Propiedades propiedadesExterna) {
-
-		pe.com.claro.eai.ws.postventa.consultaclientecesws.request.HeaderRequest header = new pe.com.claro.eai.ws.postventa.consultaclientecesws.request.HeaderRequest();
-
-		header.setAccept(propiedadesExterna.WS_REST_serviciosFija_header_Accept);
-		header.setAplicacion(propiedadesExterna.WS_REST_serviciosFija_header_Aplicacion);
-		header.setIdTransaccion(idTransaccion);
-		header.setMsgid(idTransaccion);
-		header.setTimestamp(Utilities.convertirDateAStringFormat(new Date(), propiedadesExterna.headerTimeStampFormato));
-		header.setUserId(propiedadesExterna.WS_REST_serviciosFija_header_UserId);
-
-		return header;
+		consultarLineaCuentaRequest.setValorConsulta(valorConsulta);
+		
+		return consultarLineaCuentaRequest;
+		
 	}
-
-	public ObtenerServiciosRequest requestObtenerServicios(ConsultarServicioRequestType objConsultarServicioRequestType, String tecnologia, Propiedades propiedadesExterna) {
-
-		ObtenerServiciosRequest request = new ObtenerServiciosRequest();
-		ObtenerServiciosRequestType requestType = new ObtenerServiciosRequestType();
-		List<ListOpcionalType> listaOpcional = new ArrayList<>();
-
-		requestType.setCoId(objConsultarServicioRequestType.getCoId());
-		requestType.setMsisdn(Constantes.constanteVacio);
-		requestType.setCoIdPub(Constantes.constanteVacio);
-//		requestType.setCodTecnologia(propiedadesExterna.WS_REST_serviciosFija_request_codTecnologia);
-		requestType.setCodTecnologia(tecnologia);
-		requestType.setCodProd(Constantes.constanteVacio);
-		requestType.setFlagServAdicional(propiedadesExterna.WS_REST_serviciosFija_request_FlagServAdicional);
-
-		ListOpcionalType listaEstado = new ListOpcionalType();
-		listaEstado.setClave(propiedadesExterna.paramServicioFijaClaveEstado);
-		listaEstado.setValor(propiedadesExterna.paramServicioFijaValorEstado);
-		listaOpcional.add(listaEstado);
-
-		ListOpcionalType listaCaracteristica = new ListOpcionalType();
-		listaCaracteristica.setClave(propiedadesExterna.paramServicioFijaClaveCaracteristicas);
-		listaCaracteristica.setValor(propiedadesExterna.paramServicioFijaValorCaracteristicas);
-		listaOpcional.add(listaCaracteristica);
-
-		requestType.setListaOpcional(listaOpcional);
-		request.setObtenerServiciosRequestType(requestType);
-
-
-		return request;
+	private ConsultarClienteRequest getObjConsultarClienteRequestBscsIX(ConsultarClienteRequest objConsultarClienteRequest) {
+		ConsultarClienteRequest consultarClienteRequest = new ConsultarClienteRequest();
+		consultarClienteRequest.setTipoBusqueda(objConsultarClienteRequest.getTipoBusqueda());
+		String valor;
+		if(objConsultarClienteRequest.getTipoBusqueda().equals(Constantes.DOS)) {
+			valor = propiedadesExterna.codigoPais + objConsultarClienteRequest.getValorBusqueda();
+		} else {
+			valor = objConsultarClienteRequest.getValorBusqueda();
+		}
+		consultarClienteRequest.setValorBusqueda(valor);
+		
+		return consultarClienteRequest;
 	}
-
-	public ConsultarServicioResponse cargarDatosConsultarServicioResponse(String idTransaccion, ObtenerServiciosResponse obtenerServiciosResponse,
-																		  TicklersSearchResponse ticklersSearchResponse, ObtenerDatosResponse obtenerDatosResponse) {
-
-		ConsultarServicioResponse consultarServicioResponse = new ConsultarServicioResponse();
-		ListaServicio listaServicio = new ListaServicio();
-		List<Servicio> listServicio = new ArrayList<Servicio>();
-
-		for (int i = 0; i < obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().size(); i++) {
-			Servicio servicio = new Servicio();
-			servicio.setGrupo(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getDecripcionGrupo() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getDecripcionGrupo());
-			servicio.setServicio(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSpcodeDes() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSpcodeDes());
-			servicio.setValidoDesde(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getValidoDesde() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getValidoDesde());
-			servicio.setEstado(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getEstado() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getEstado());
-			if (obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getNumeroGrupo() != null) { servicio.setTipoServicio(obtenerTipoServicio(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getNumeroGrupo())); } else {servicio.setTipoServicio(PropertiesInternos.STRING_EMPTY);}
-			if(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getTipoPO() != null && obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSuscripcion() != null && obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getCargoFijo() != null) {servicio.setCargoFijo(obtenerCargoFijo(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getTipoPO(), obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSuscripcion(), obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getCargoFijo()));} else { servicio.setCargoFijo(PropertiesInternos.STRING_EMPTY); }
-			if(ticklersSearchResponse.getResult().getItem().get(0).getTickNumber() == null) {servicio.setCodBloqueo(PropertiesInternos.STRING_EMPTY);}else{servicio.setCodBloqueo(Long.toString(ticklersSearchResponse.getResult().getItem().get(0).getTickNumber()));}
-			servicio.setBloqueo(obtenerDatosResponse.getListaMotivosReason().get(0).getDescripcionRazon() == null ? PropertiesInternos.STRING_EMPTY : obtenerDatosResponse.getListaMotivosReason().get(0).getDescripcionRazon());
-			listServicio.add(servicio);
-		}
-
-		List<ListaCaracteristicasType> listaCaracteristicas = obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaCaracteristicas();
-		for (int i = 0; i < listaCaracteristicas.size(); i++) {
-			Servicio servicio = new Servicio();
-			servicio.setGrupo(listaCaracteristicas.get(i).getDescripcionGrupo() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getDescripcionGrupo());
-			servicio.setServicio(listaCaracteristicas.get(i).getSpcodedes() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getSpcodedes());
-			servicio.setValidoDesde(listaCaracteristicas.get(i).getValidoDesde() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getValidoDesde());
-			servicio.setEstado(listaCaracteristicas.get(i).getEstado() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getEstado());
-			if (listaCaracteristicas.get(i).getNumeroGrupo() != null) {servicio.setTipoServicio(obtenerTipoServicio(listaCaracteristicas.get(i).getNumeroGrupo()));} else {servicio.setTipoServicio(PropertiesInternos.STRING_EMPTY);}
-			servicio.setCargoFijo(listaCaracteristicas.get(i).getMonto() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getMonto());
-			if(ticklersSearchResponse.getResult().getItem().get(0).getTickNumber() == null) {servicio.setCodBloqueo(PropertiesInternos.STRING_EMPTY);}else{servicio.setCodBloqueo(Long.toString(ticklersSearchResponse.getResult().getItem().get(0).getTickNumber()));}
-			servicio.setBloqueo(obtenerDatosResponse.getListaMotivosReason().get(0).getDescripcionRazon() == null ? PropertiesInternos.STRING_EMPTY : obtenerDatosResponse.getListaMotivosReason().get(0).getDescripcionRazon());
-			listServicio.add(servicio);
-		}
-
-		listaServicio.setListServicio(listServicio);
-		consultarServicioResponse.setMsgRespuesta(PropertiesInternos.STRING_EMPTY);
-		consultarServicioResponse.setListServicio(listaServicio);
-
-		return consultarServicioResponse;
-	}
-
-	public ConsultarServicioResponse cargarDatosConsultarServicioResponseAct2(String idTransaccion, ObtenerServiciosResponse obtenerServiciosResponse) {
-
-		ConsultarServicioResponse consultarServicioResponse = new ConsultarServicioResponse();
-		ListaServicio listaServicio = new ListaServicio();
-		List<Servicio> listServicio = new ArrayList<Servicio>();
-
-		for (int i = 0; i < obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().size(); i++) {
-			Servicio servicio = new Servicio();
-			servicio.setGrupo(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getDecripcionGrupo() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getDecripcionGrupo());
-			servicio.setServicio(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSpcodeDes() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSpcodeDes());
-			servicio.setValidoDesde(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getValidoDesde() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getValidoDesde());
-			servicio.setEstado(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getEstado() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getEstado());
-			if (obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getNumeroGrupo() != null) { servicio.setTipoServicio(obtenerTipoServicio(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getNumeroGrupo())); } else {servicio.setTipoServicio(PropertiesInternos.STRING_EMPTY);}
-			if(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getTipoPO() != null && obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSuscripcion() != null && obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getCargoFijo() != null) {servicio.setCargoFijo(obtenerCargoFijo(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getTipoPO(), obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSuscripcion(), obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getCargoFijo()));} else { servicio.setCargoFijo(PropertiesInternos.STRING_EMPTY); }
-			servicio.setCodBloqueo(PropertiesInternos.STRING_EMPTY);
-			servicio.setBloqueo(PropertiesInternos.STRING_EMPTY);
-
-			listServicio.add(servicio);
-		}
-
-		List<ListaCaracteristicasType> listaCaracteristicas = obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaCaracteristicas();
-		for (int i = 0; i < listaCaracteristicas.size(); i++) {
-			Servicio servicio = new Servicio();
-			servicio.setGrupo(listaCaracteristicas.get(i).getDescripcionGrupo() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getDescripcionGrupo());
-			servicio.setServicio(listaCaracteristicas.get(i).getSpcodedes() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getSpcodedes());
-			servicio.setValidoDesde(listaCaracteristicas.get(i).getValidoDesde() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getValidoDesde());
-			servicio.setEstado(listaCaracteristicas.get(i).getEstado() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getEstado());
-			if (listaCaracteristicas.get(i).getNumeroGrupo() != null) {servicio.setTipoServicio(obtenerTipoServicio(listaCaracteristicas.get(i).getNumeroGrupo()));} else {servicio.setTipoServicio(PropertiesInternos.STRING_EMPTY);}
-			servicio.setCargoFijo(listaCaracteristicas.get(i).getMonto() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getMonto());
-			servicio.setCodBloqueo(PropertiesInternos.STRING_EMPTY);
-			servicio.setBloqueo(PropertiesInternos.STRING_EMPTY);
-			listServicio.add(servicio);
-		}
-
-		listaServicio.setListServicio(listServicio);
-		consultarServicioResponse.setMsgRespuesta(PropertiesInternos.STRING_EMPTY);
-		consultarServicioResponse.setListServicio(listaServicio);
-
-		return consultarServicioResponse;
-
-	}
-
-	public ConsultarServicioResponse cargarDatosConsultarServicioResponseAct2_1(String idTransaccion, ObtenerServiciosResponse obtenerServiciosResponse,
-																				TicklersSearchResponse ticklersSearchResponse) {
-
-		ConsultarServicioResponse consultarServicioResponse = new ConsultarServicioResponse();
-		ListaServicio listaServicio = new ListaServicio();
-		List<Servicio> listServicio = new ArrayList<Servicio>();
-
-		for (int i = 0; i < obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().size(); i++) {
-			Servicio servicio = new Servicio();
-			servicio.setGrupo(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getDecripcionGrupo() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getDecripcionGrupo());
-			servicio.setServicio(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSpcodeDes() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSpcodeDes());
-			servicio.setValidoDesde(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getValidoDesde() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getValidoDesde());
-			servicio.setEstado(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getEstado() == null ? PropertiesInternos.STRING_EMPTY : obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getEstado());
-			if (obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getNumeroGrupo() != null) { servicio.setTipoServicio(obtenerTipoServicio(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getNumeroGrupo())); } else {servicio.setTipoServicio(PropertiesInternos.STRING_EMPTY);}
-			if(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getTipoPO() != null && obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSuscripcion() != null && obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getCargoFijo() != null) {servicio.setCargoFijo(obtenerCargoFijo(obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getTipoPO(), obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getSuscripcion(), obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaServiciosAsignados().get(i).getCargoFijo()));} else { servicio.setCargoFijo(PropertiesInternos.STRING_EMPTY); }
-			if(ticklersSearchResponse.getResult().getItem().get(0).getTickNumber() == null) {servicio.setCodBloqueo(PropertiesInternos.STRING_EMPTY);}else{servicio.setCodBloqueo(Long.toString(ticklersSearchResponse.getResult().getItem().get(0).getTickNumber()));}
-			servicio.setBloqueo(PropertiesInternos.STRING_EMPTY);
-
-			listServicio.add(servicio);
-		}
-
-		List<ListaCaracteristicasType> listaCaracteristicas = obtenerServiciosResponse.getObtenerServiciosResponseType().getResponseData().getListaCaracteristicas();
-		for (int i = 0; i < listaCaracteristicas.size(); i++) {
-			Servicio servicio = new Servicio();
-			servicio.setGrupo(listaCaracteristicas.get(i).getDescripcionGrupo() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getDescripcionGrupo());
-			servicio.setServicio(listaCaracteristicas.get(i).getSpcodedes() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getSpcodedes());
-			servicio.setValidoDesde(listaCaracteristicas.get(i).getValidoDesde() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getValidoDesde());
-			servicio.setEstado(listaCaracteristicas.get(i).getEstado() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getEstado());
-			if (listaCaracteristicas.get(i).getNumeroGrupo() != null) { servicio.setTipoServicio(obtenerTipoServicio(listaCaracteristicas.get(i).getNumeroGrupo()));} else {servicio.setTipoServicio(PropertiesInternos.STRING_EMPTY);}
-			servicio.setCargoFijo(listaCaracteristicas.get(i).getMonto() == null ? PropertiesInternos.STRING_EMPTY : listaCaracteristicas.get(i).getMonto());
-			if(ticklersSearchResponse.getResult().getItem().get(0).getTickNumber() == null) {servicio.setCodBloqueo(PropertiesInternos.STRING_EMPTY);}else{servicio.setCodBloqueo(Long.toString(ticklersSearchResponse.getResult().getItem().get(0).getTickNumber()));}
-			servicio.setBloqueo(PropertiesInternos.STRING_EMPTY);
-
-			listServicio.add(servicio);
-		}
-
-		listaServicio.setListServicio(listServicio);
-		consultarServicioResponse.setMsgRespuesta(PropertiesInternos.STRING_EMPTY);
-		consultarServicioResponse.setListServicio(listaServicio);
-
-		return consultarServicioResponse;
-
-	}
-
-	public String obtenerTipoServicio(String numeroGrupo) {
-
-		String tipoServicio = PropertiesInternos.STRING_EMPTY;
-
-		if(validarListaSeparador(propiedadesExterna.paramNumerogrupoTelefono,
-				Constantes.PUNTO_COMA, numeroGrupo)) {
-			tipoServicio = "TLF";
-		}else if (validarListaSeparador(propiedadesExterna.paramNumerogrupoCable,
-				Constantes.PUNTO_COMA, numeroGrupo)) {
-			tipoServicio = "CTV";
-		}else if (validarListaSeparador(propiedadesExterna.paramNumerogrupoInternet,
-				Constantes.PUNTO_COMA, numeroGrupo)) {
-			tipoServicio = "INT";
-		}
-
-		return tipoServicio;
-	}
-
-	private boolean validarListaSeparador(String lista, String separador, String valor) {
-		String[] listaArray = lista.split(separador);
-		for(String itm : listaArray) {
-			if(itm.equals(valor)) {
-				return true;
+	public ConsultarClienteResponse unificarCliente(String mensajeLog, ConsultarClienteResponse objConsultarClienteResponse1, ConsultarClienteResponse objConsultarClienteResponse2){
+		
+		LOGGER.info(mensajeLog + "--------- Inicio Actividad Nro 4. Unificar datos (SGA y BSCS) --------- ");
+		ConsultarClienteResponse objConsultarClienteResponse = new ConsultarClienteResponse();
+		objConsultarClienteResponse = objConsultarClienteResponse2;
+		if(objConsultarClienteResponse1.getCodRespuesta()!=null){
+			if(objConsultarClienteResponse1.getCodRespuesta().equalsIgnoreCase(propiedadesExterna.IDF0CODIGO)){
+				if (!objConsultarClienteResponse1.getMsgRespuesta().equalsIgnoreCase(Constantes.CURSOR_VACIO)
+						&& objConsultarClienteResponse1.getListCliente() != null) {
+					objConsultarClienteResponse = objConsultarClienteResponse1;
+					if(objConsultarClienteResponse2.getCodRespuesta().equalsIgnoreCase(propiedadesExterna.IDF0CODIGO)){
+						if (!objConsultarClienteResponse2.getMsgRespuesta().equalsIgnoreCase(Constantes.CURSOR_VACIO)
+								&& objConsultarClienteResponse2.getListCliente() != null) {
+							for (Cliente cliente : objConsultarClienteResponse2.getListCliente().getListCliente()) {
+								objConsultarClienteResponse.getListCliente().getListCliente().add(cliente);
+							}
+						}
+					}
+				}
 			}
 		}
-		return false;
-	}
-
-	public String obtenerCargoFijo(String tipoPO, String suscripcion, String cargoFijo) {
-
-		if(tipoPO.equals("AON")) {
-			cargoFijo = suscripcion;
-		} else if (cargoFijo.equals(null)) {
-			cargoFijo = PropertiesInternos.STRING_EMPTY;
-		}
-
-		return cargoFijo;
+		LOGGER.info("Datos unificados: " + JAXBUtilitarios.anyObjectToXmlText(objConsultarClienteResponse));
+		LOGGER.info(mensajeLog + "--------- Fin Actividad Nro 4. Unificar datos (SGA y BSCS) --------- ");
+		return objConsultarClienteResponse;
 	}
 }

@@ -16,6 +16,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="CambiosIsaac" target="1.5" />
+      <module name="consultaclientecesws" target="1.5" />
       <module name="consultaclientecesws-common" target="1.8" />
       <module name="consultaclientecesws-dao" target="1.8" />
       <module name="consultaclientecesws-integration" target="1.8" />

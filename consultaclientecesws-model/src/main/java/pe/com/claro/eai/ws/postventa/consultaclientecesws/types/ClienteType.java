@@ -70,7 +70,8 @@ import javax.xml.bind.annotation.XmlType;
     "estadoCliente",
     "correspElectronica",
     "codSuc",
-    "numSlc"
+    "numSlc",
+    "flagToBe"
 })
 public class ClienteType {
 
@@ -118,6 +119,8 @@ public class ClienteType {
     protected String codSuc;
     @XmlElement(required = true)
     protected String numSlc;
+    @XmlElement(required = true)
+    protected String flagToBe;
 
     /**
      * Obtiene el valor de la propiedad customerid.
@@ -646,5 +649,13 @@ public class ClienteType {
     public void setNumSlc(String value) {
         this.numSlc = value;
     }
+
+	public String getFlagToBe() {
+		return flagToBe;
+	}
+
+	public void setFlagToBe(String flagToBe) {
+		this.flagToBe = flagToBe;
+	}
 
 }
