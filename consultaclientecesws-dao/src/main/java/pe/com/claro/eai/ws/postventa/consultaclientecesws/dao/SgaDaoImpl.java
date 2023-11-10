@@ -1,5 +1,6 @@
 package pe.com.claro.eai.ws.postventa.consultaclientecesws.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,67 +24,10 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
 import oracle.jdbc.driver.OracleTypes;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Cliente;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ClientePorNombre;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClientePorNombreResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClienteRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarClienteResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalDTHRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalDTHResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarDetalleSucursalResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEquipoResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEstadoServiciosRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarEstadoServiciosResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarFallaRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarFallaResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarInteraccionCasosRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarInteraccionCasosResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarJanusRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarJanusResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarReglaRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarReglaResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarSeaChangeRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarSeaChangeResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioSucursalRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarServicioSucursalResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGARequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ConsultarTecnologiaSGAResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosIncidencia;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DatosSot;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DetalleSucursal;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.DetalleSucursalDTH;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Equipo;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.EstadoServicio;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Falla;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Janus;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaCliente;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaClientePorNombre;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaDatosIncidencia;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaDatosSot;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaFalla;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaJanus;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaRegla;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaSeaChange;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ListaServicio;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ReconectarNcosResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.RegistrarAuditoriaRequest;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.RegistrarAuditoriaResponse;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Regla;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.SeaChange;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.Servicio;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.ServicioSucursal;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.TecnologiaSGA;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.bean.*;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.dao.util.Utilitario;
 import pe.com.claro.eai.ws.postventa.consultaclientecesws.exception.DBException;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Constantes;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.PropertiesInternos;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Propiedades;
-import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.Utilitarios;
+import pe.com.claro.eai.ws.postventa.consultaclientecesws.util.*;
 
 @Repository
 public class SgaDaoImpl implements SgaDao {
@@ -2480,6 +2424,119 @@ public class SgaDaoImpl implements SgaDao {
 
 		logger.info(String.valueOf(mensajeLog) + " == Fin del metodo " + metodo);
 		return objResponse;
+	}
+
+	@Override
+	public ObtenerDatosClienteResponse obtenerDatosCliente(String mensajeTransaccion,
+														   String i_codId) throws DBException {
+		// TODO Auto-generated method stub
+		String metodo = "obtenerTecnologia";
+		String mensajeLog = mensajeTransaccion + "[" + metodo + "]-";
+		ObtenerDatosClienteResponse response = new ObtenerDatosClienteResponse();
+		logger.info(mensajeLog + " == Inicio del metodo " + metodo);
+		Connection conexion = null;
+		try {
+
+			logger.info(mensajeLog + "Consultando BD " + this.propiedadesExterna.dbSGADB + ", con JNDI = ["
+					+ this.propiedadesExterna.cJNDI_SGA + "]");
+			sgaDS.setLoginTimeout(this.propiedadesExterna.dbSgaDBLoginTimeout);
+			conexion = sgaDS.getConnection();
+			SimpleJdbcCall jdbcCall = new SimpleJdbcCall(sgaDS).withoutProcedureColumnMetaDataAccess()
+					.withoutProcedureColumnMetaDataAccess().withSchemaName(this.propiedadesExterna.dbSGADBOwnerOperacion)
+					.withProcedureName(this.propiedadesExterna.pkgPostventaOne.concat(PropertiesInternos.PUNTO)
+							.concat(this.propiedadesExterna.spsgassListaDatosCLiente))
+					.declareParameters(new SqlParameter("P_COD_ID", OracleTypes.INTEGER),
+							new SqlOutParameter("P_ERROR", OracleTypes.INTEGER),
+							new SqlOutParameter("P_MENSAJE", OracleTypes.VARCHAR),
+							new SqlOutParameter("P_DAT_CLI", OracleTypes.CURSOR, new RowMapper<DatosCliente>() {
+								public DatosCliente mapRow(ResultSet rs, int arg1) throws SQLException {
+									DatosCliente datosCliente= new DatosCliente();
+									datosCliente.setC_contrato(rs.getString("CONTRATO") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("CONTRATO"));
+									datosCliente.setC_codcliente(rs.getString("CODCLIENTE") == null ? PropertiesInternos.STRING_EMPTY
+											: rs.getString("CODCLIENTE"));
+									datosCliente.setC_plano(rs.getString("PLANO") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("PLANO"));
+									datosCliente.setC_ubigeo(rs.getString("UBIGEO") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("UBIGEO"));
+									datosCliente.setC_estadoservicio(rs.getString("ESTADOSERVICIO") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("ESTADOSERVICIO"));
+									datosCliente.setC_cargoreconx(rs.getString("CARGORECONX") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("CARGORECONX"));
+									datosCliente.setC_tecnologia(rs.getString("TECNOLOGIA") == null
+											? PropertiesInternos.STRING_EMPTY : rs.getString("TECNOLOGIA"));
+									return datosCliente;
+								}
+							}));
+
+			logger.info(mensajeLog + "Se invocara el SP : "
+					+ this.propiedadesExterna.dbSGADBOwnerOperacion.concat(PropertiesInternos.PUNTO)
+					.concat(this.propiedadesExterna.pkgPostventaOne).concat(PropertiesInternos.PUNTO)
+					.concat(this.propiedadesExterna.spsgassListaDatosCLiente));
+			logger.info(mensajeLog + "PARAMETROS [INPUT]: ");
+			logger.info(mensajeLog + "[P_COD_ID] = " + i_codId);
+
+			SqlParameterSource objParametrosIN = new MapSqlParameterSource().addValue("P_COD_ID", i_codId);
+
+			jdbcCall.getJdbcTemplate().setQueryTimeout(this.propiedadesExterna.cEXECUTION_TIMEOUT_SGA);
+			Map<String, Object> resultMap = jdbcCall.execute(objParametrosIN);
+
+			logger.info(mensajeLog + "PARAMETROS [OUTPUT]: ");
+			logger.info(mensajeLog + "[P_ERROR] = " + resultMap.get("P_ERROR"));
+			logger.info(mensajeLog + "[P_MENSAJE] = " + resultMap.get("P_MENSAJE"));
+
+			ListaDatosCliente listaDatosCliente = new ListaDatosCliente();
+			response.setO_error(resultMap.get("P_ERROR") != null
+					? resultMap.get("P_ERROR").toString() : PropertiesInternos.STRING_EMPTY);
+			if (response.getO_error().trim().equals(propiedadesExterna.IDF0CODIGO))
+				listaDatosCliente.setListDatosCliente((List<DatosCliente>) resultMap.get("P_DAT_CLI")) ;
+			logger.info(mensajeLog + "[Cantidad PO_CURSOR_SERVICIO] = "
+					+ (listaDatosCliente.getListDatosCliente() != null ? listaDatosCliente.getListDatosCliente().size() : 0));
+
+			String mensaje = PropertiesInternos.STRING_EMPTY;
+			if (listaDatosCliente.getListDatosCliente() != null) {
+				if (!listaDatosCliente.getListDatosCliente().isEmpty()) {
+					logger.info(mensajeLog + Constantes.LISTA_NO_VACIA);
+					response.setListDatosCliente(listaDatosCliente);
+					mensaje = resultMap.get("P_MENSAJE") != null ? resultMap.get("P_MENSAJE").toString()
+							: PropertiesInternos.STRING_EMPTY;
+				} else {
+					logger.info(mensajeLog + Constantes.LISTA_VACIA);
+					mensaje = Constantes.CURSOR_VACIO;
+				}
+			} else {
+				mensaje = resultMap.get("P_MENSAJE") != null ? resultMap.get("P_MENSAJE").toString()
+						: PropertiesInternos.STRING_EMPTY;
+			}
+			response.setO_msg(mensaje);
+			logger.info(mensajeLog + "[SALIDA] = "
+					+ JAXBUtilitarios.anyObjectToXmlText(response));
+
+		} catch (Exception e) {
+			logger.error(mensajeLog + "Error en la ejecucion del SP : ", e);
+			String error = e.toString();
+			String codError = PropertiesInternos.STRING_EMPTY;
+			String msjError = PropertiesInternos.STRING_EMPTY;
+			if (error.toUpperCase(Locale.getDefault())
+					.contains(propiedadesExterna.dbErrorSqlTimeOutException.toUpperCase(Locale.getDefault()))) {
+				codError = propiedadesExterna.codConsultaClienteCESIdt1;
+				msjError = propiedadesExterna.msjConsultaClienteCESIdt1;
+			} else {
+				codError = propiedadesExterna.codConsultaClienteCESIdt2;
+				msjError = propiedadesExterna.msjConsultaClienteCESIdt2;
+			}
+			throw new DBException(codError, msjError.replace("$bd", propiedadesExterna.dbSGADB)
+					.replace("$sp", propiedadesExterna.spsgassListaDatosCLiente).replace("$msg", error));
+		} finally {
+			try {
+				Utilitario.close(mensajeLog, conexion);
+			} catch (SQLException e) {
+				logger.info(mensajeLog + "ERROR al cerrar la conexion: [Exception] - [" + e.getMessage() + "]", e);
+			}
+		}
+
+		logger.info(mensajeLog + " == Fin del metodo " + metodo);
+		return response;
 	}
 
 }

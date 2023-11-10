@@ -14,5 +14,14 @@
         <module name="consultaclientecesws-model" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="CambiosIsaac" target="1.5" />
+      <module name="consultaclientecesws-common" target="1.8" />
+      <module name="consultaclientecesws-dao" target="1.8" />
+      <module name="consultaclientecesws-integration" target="1.8" />
+      <module name="consultaclientecesws-model" target="1.8" />
+      <module name="consultaclientecesws-service" target="1.8" />
+      <module name="consultaclientecesws-webapp" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

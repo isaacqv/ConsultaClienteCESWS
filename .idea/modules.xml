@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/CambiosIsaac.iml" filepath="$PROJECT_DIR$/.idea/CambiosIsaac.iml" />
+      <module fileurl="file://$PROJECT_DIR$/consultaclientecesws-common/consultaclientecesws-common.iml" filepath="$PROJECT_DIR$/consultaclientecesws-common/consultaclientecesws-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/consultaclientecesws-dao/consultaclientecesws-dao.iml" filepath="$PROJECT_DIR$/consultaclientecesws-dao/consultaclientecesws-dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/consultaclientecesws-integration/consultaclientecesws-integration.iml" filepath="$PROJECT_DIR$/consultaclientecesws-integration/consultaclientecesws-integration.iml" />
+      <module fileurl="file://$PROJECT_DIR$/consultaclientecesws-model/consultaclientecesws-model.iml" filepath="$PROJECT_DIR$/consultaclientecesws-model/consultaclientecesws-model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/consultaclientecesws-service/consultaclientecesws-service.iml" filepath="$PROJECT_DIR$/consultaclientecesws-service/consultaclientecesws-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/consultaclientecesws-webapp/consultaclientecesws-webapp.iml" filepath="$PROJECT_DIR$/consultaclientecesws-webapp/consultaclientecesws-webapp.iml" />
+    </modules>
+  </component>
+</project>

@@ -239,4 +239,159 @@ public class Propiedades {
 	@Value("${consultaClienteCES.source}")
 	public String source;
 
+	// DATA_SOURCE BSCS9
+	@Value("${bd.bscs9.jndi}")
+	public String cJNDI_BSCS9;
+	@Value("${bd.bscs9.ejecucion.timeout}")
+	public Integer cEXECUTION_TIMEOUT_BSCS9;
+	@Value("${bd.bscs9.pkg014SicesfConsultas}")
+	public String pkg014SicesfConsultasBSCS9;
+	@Value("${bd.bscs9.spSicessCustomer}")
+	public String bscs9SpSicessCustomerBSCS9;
+	@Value("${bd.bscs9.spSicessTecnologia}")
+	public String bscs9SpSicessTecnologia;
+
+	@Value("${db.dbbscsdb9.logintimeout}")
+	public Integer dbBscsDB9LoginTimeout;
+	@Value("${db.bscsdb9.name}")
+	public String dbBSCSDB9;
+	@Value("${db.bscs9.owner}")
+	public String dbBSCSDB9Owner;
+
+	@Value("${ws.consulta.linea.cuenta.cbiows.url}")
+	public String wsConsultaLineaCuentaCbiowsUrl;
+	@Value("${ws.consulta.linea.cuenta.cbiows.nombre}")
+	public String wsConsultaLineaCuentaCbiowsNombre;
+	@Value("${ws.consulta.linea.cuenta.cbiows.metodo}")
+	public String wsConsultaLineaCuentaCbiowsMetodo;
+	@Value("${ws.consulta.linea.cuenta.cbiows.request.timeout}")
+	public String wsConsultaLineaCuentaCbiowsRequestTimeout;
+	@Value("${ws.consulta.linea.cuenta.cbiows.connection.timeout}")
+	public String wsConsultaLineaCuentaCbiowsConnectionTimeout;
+
+	// ------------ DatosRazonWS ------------//
+	@Value("${ws.soap.datosRazonWS.uri}")
+	public String WS_SOAP_DATOSRAZONWS_URI;
+	@Value("${ws.soap.datosRazonWS.connectionTimeout}")
+	public String WS_SOAP_DATOSRAZONWS_CONECTIONTIMEOUT;
+	@Value("${ws.soap.datosRazonWS.readTimeout}")
+	public String WS_SOAP_DATOSRAZONWS_READTIMEOUT;
+	@Value("${ws.soap.datosRazonWS.nombre}")
+	public String WS_SOAP_DATOSRAZONWS_NOMBRE;
+	@Value("${ws.soap.datosRazonWS.metodo}")
+	public String WS_SOAP_DATOSRAZONWS_METODO;
+
+	@Value("${ws.soap.datosRazonWS.header.nombreAplicacion")
+	public String WS_SOAP_datosRazonWS_header_nombreAplicacion;
+	@Value("${ws.soap.datosRazonWS.header.ipAplicacion")
+	public String WS_SOAP_datosRazonWS_header_ipAplicacion;
+	@Value("${ws.soap.datosRazonWS.header.usuarioAplicacion")
+	public String WS_SOAP_datosRazonWS_header_usuarioAplicacion;
+
+	// ------------ CON_TICKLERS_SEARCH ------------//
+	@Value("${ws.soap.ticklersSearchWS.uri}")
+	public String WS_SOAP_TICKLERSNWS_URI;
+	@Value("${ws.soap.ticklersSearchWS.connectionTimeout}")
+	public String WS_SOAP_TICKLERS_CONECTIONTIMEOUT;
+	@Value("${ws.soap.ticklersSearchWS.readTimeout}")
+	public String WS_SOAP_TICKLERS_READTIMEOUT;
+	@Value("${ws.soap.ticklersSearchWS.nombre}")
+	public String WS_SOAP_TICKLERSNWS_NOMBRE;
+	@Value("${ws.soap.ticklersSearchWS.metodo}")
+	public String WS_SOAP_TICKLERSNWS_METODO;
+
+	// ------------ EXTRAS ------------//
+	@Value("${ticket.status}")
+	public String TICKET_STATUS;
+	@Value("${ws.bloqueodesbloqueo.key}")
+	public String key;
+	@Value("${ws.bloqueodesbloqueo.value}")
+	public String value;
+
+	// ------------ claro-post-serviciosFija ------------//
+	@Value("${ws.rest.serviciosFija.uri}")
+	public String WS_REST_serviciosFija_URI;
+	@Value("${ws.rest.serviciosFija.connectionTimeout}")
+	public String WS_REST_serviciosFija_CONECTIONTIMEOUT;
+	@Value("${ws.rest.serviciosFija.readTimeout}")
+	public String WS_REST_serviciosFija_READTIMEOUT;
+	@Value("${ws.rest.serviciosFija.nombre}")
+	public String WS_REST_serviciosFija_NOMBRE;
+	@Value("${ws.rest.serviciosFija.metodo}")
+	public String WS_REST_serviciosFija_METODO;
+
+
+	@Value("${ws.rest.serviciosFija.header.accept}")
+	public String WS_REST_serviciosFija_header_Accept;
+	@Value("${ws.rest.serviciosFija.header.aplicacion}")
+	public String WS_REST_serviciosFija_header_Aplicacion;
+	@Value("${ws.rest.serviciosFija.header.userId}")
+	public String WS_REST_serviciosFija_header_UserId;
+
+	@Value("${ws.rest.serviciosFija.request.codTecnologia}")
+	public String WS_REST_serviciosFija_request_codTecnologia;
+	@Value("${ws.rest.serviciosFija.request.FlagServAdicional}")
+	public String WS_REST_serviciosFija_request_FlagServAdicional;
+
+	// ------------ Otros ------------//
+	@Value("${idt1.codigo}")
+	public String idt1Codigo;
+	@Value("${idt1.mensaje}")
+	public String idt1Mensaje;
+	@Value("${idt2.codigo}")
+	public String idt2Codigo;
+	@Value("${idt2.mensaje}")
+	public String idt2Mensaje;
+	@Value("${idt3.codigo}")
+	public String idt3Codigo;
+	@Value("${idt3.mensaje}")
+	public String idt3Mensaje;
+
+	@Value("${idt1.codigo.v2}")
+	public String idt1Codigov2;
+	@Value("${idt1.mensaje.v2}")
+	public String idt1Mensajev2;
+	@Value("${idt2.codigo.v2}")
+	public String idt2Codigov2;
+	@Value("${idt2.mensaje.v2}")
+	public String idt2Mensajev2;
+
+	//[INICIATIVA-592] - consultarServicio/v24.0 - 16/02/2021
+	@Value("${flag.convivencia.consultarServicio}")
+	public String flagConvivenciaConServicio;
+	@Value("${valor.tipo.consulta.consultarServicio}")
+	public String valorTipoConsultaConServicio;
+
+	@Value("${bd.sga.pkgpostventaone}")
+	public String pkgPostventaOne;
+	@Value("${bd.sga.pkgpostventaone.listadatoscliente}")
+	public String spsgassListaDatosCLiente;
+
+	@Value("${idf3.codigo}")
+	public String IDF3CODIGO;
+	@Value("${idf3.mensaje}")
+	public String IDF3MENSAJE;
+
+	@Value("${param.servicioFija.clave.estado}")
+	public String paramServicioFijaClaveEstado;
+	@Value("${param.servicioFija.valor.estado}")
+	public String paramServicioFijaValorEstado;
+	@Value("${param.servicioFija.clave.caracteristicas}")
+	public String paramServicioFijaClaveCaracteristicas;
+	@Value("${param.servicioFija.valor.caracteristicas}")
+	public String paramServicioFijaValorCaracteristicas;
+
+	@Value("${header.timestamp.formato}")
+	public String headerTimeStampFormato;
+	@Value("${idf1.mensaje.v2}")
+	public String IDF1MENSAJEV2;
+
+	@Value("${param.tipoPO.excluido}")
+	public String paramTipoPOExcluido;
+	@Value("${param.numerogrupo.telefono}")
+	public String paramNumerogrupoTelefono;
+	@Value("${param.numerogrupo.cable}")
+	public String paramNumerogrupoCable;
+	@Value("${param.numerogrupo.internet}")
+	public String paramNumerogrupoInternet;
 }

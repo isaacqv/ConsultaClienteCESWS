@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="consultaclientecesws-webapp:war">
+    <output-path>$PROJECT_DIR$/consultaclientecesws-webapp/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>consultaclientecesws-webapp</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="ConsultaClienteCESWS-1.0.0.war">
+      <element id="artifact" artifact-name="consultaclientecesws-webapp:war exploded" />
+    </root>
+  </artifact>
+</component>
